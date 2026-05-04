@@ -1,5 +1,10 @@
 import { PhoneFrame } from '@/components/PhoneFrame'
+import { Onboarding } from '@/components/Onboarding'
 
 export default function Home() {
-  return <PhoneFrame />
+  return (
+    <PhoneFrame>
+      <Onboarding />
+    </PhoneFrame>
+  )
 }
