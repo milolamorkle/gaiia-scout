@@ -5,6 +5,7 @@ const FRAME_WIDTH = 390
 const FRAME_HEIGHT = 844
 const NOTCH_WIDTH = 120
 const NOTCH_HEIGHT = 30
+const TOP_SAFE_AREA = 47
 const STATUS_BAR_HEIGHT = 44
 
 export function PhoneFrame({ children }: { children?: ReactNode }) {
@@ -27,7 +28,7 @@ export function PhoneFrame({ children }: { children?: ReactNode }) {
           top: 0,
           left: 0,
           right: 0,
-          height: STATUS_BAR_HEIGHT + NOTCH_HEIGHT / 2,
+          height: TOP_SAFE_AREA,
           backgroundColor: '#000',
           zIndex: 10,
         }}
@@ -48,7 +49,7 @@ export function PhoneFrame({ children }: { children?: ReactNode }) {
         <div
           style={{
             position: 'absolute',
-            top: NOTCH_HEIGHT,
+            top: 0,
             left: 0,
             right: 0,
             height: STATUS_BAR_HEIGHT,
@@ -68,7 +69,7 @@ export function PhoneFrame({ children }: { children?: ReactNode }) {
       <div
         style={{
           position: 'absolute',
-          top: STATUS_BAR_HEIGHT + NOTCH_HEIGHT,
+          top: TOP_SAFE_AREA,
           left: 0,
           right: 0,
           bottom: 0,
