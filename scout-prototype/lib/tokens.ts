@@ -1,8 +1,8 @@
 export const tokens = {
   // ISP Brand (loaded dynamically in real app — hardcoded in prototype)
-  ispPrimary: '#0EA5E9',        // Uplink Internet blue
-  ispPrimaryDark: '#0284C7',
-  ispPrimaryLight: '#E0F2FE',
+  ispPrimary: '#5B21B6',       // IQ Fiber purple — update this hex if iqfiber.com shows a different value
+  ispPrimaryDark: '#4C1D95',
+  ispPrimaryLight: '#EDE9FE',
 
   // Neutrals
   bg: '#FFFFFF',

@@ -1,16 +1,16 @@
 export const fixture = {
   isp: {
-    name: 'Uplink Internet',
-    primaryColor: '#0EA5E9',
-    supportPhone: '1-800-465-5465',
-    supportLabel: 'Uplink Support',
+    name: 'IQ Fiber',
+    primaryColor: '#5B21B6',      // must match tokens.ispPrimary exactly
+    supportPhone: '1-833-474-3237',
+    supportLabel: 'IQ Fiber Support',
   },
   subscriber: {
     name: 'Sarah Chen',
     firstName: 'Sarah',
-    plan: 'Uplink Fiber 500',
-    downloadSpeed: 500,
-    uploadSpeed: 100,
+    plan: 'IQ Fiber Gig',
+    downloadSpeed: 1000,
+    uploadSpeed: 1000,
     accountStatus: 'Active' as const,
   },
   cpe: {
