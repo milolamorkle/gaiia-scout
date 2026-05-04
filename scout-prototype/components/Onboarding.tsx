@@ -12,6 +12,7 @@ import { startOutageCheck } from '@/lib/outageCheck'
 import { IssueSelection } from './screens/IssueSelection'
 import { OutageCheck } from './screens/OutageCheck'
 import { BehavioralProxy } from './screens/BehavioralProxy'
+import { EquipmentLocator } from './screens/EquipmentLocator'
 import { DevicePhotoPrompt } from './screens/DevicePhotoPrompt'
 import { PhotoAnalysis } from './screens/PhotoAnalysis'
 import { Diagnosis } from './screens/Diagnosis'
@@ -32,6 +33,7 @@ export type Screen =
   | 'issue'
   | 'outage-check'
   | 'behavioral'
+  | 'equipment-locator'
   | 'photo-prompt'
   | 'photo-analysis'
   | 'diagnosis'
@@ -131,7 +133,15 @@ export function Onboarding() {
           {screen === 'behavioral' && (
             <BehavioralProxy
               onContinue={() => go('photo-prompt')}
+              onUnsure={() => go('equipment-locator')}
               onBack={() => go('issue', 'back')}
+            />
+          )}
+          {screen === 'equipment-locator' && (
+            <EquipmentLocator
+              onFound={() => go('photo-prompt')}
+              onCantFind={() => go('escalation-intro')}
+              onBack={() => go('behavioral', 'back')}
             />
           )}
           {screen === 'photo-prompt' && (

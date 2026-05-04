@@ -4,14 +4,13 @@ import { tokens } from '@/lib/tokens'
 import { BackButton } from '@/components/BackButton'
 import { EscapeHatch } from '@/components/EscapeHatch'
 
-// Note: "No, I'm not sure where it is" would normally route to the Equipment Locator
-// flow — out of prototype scope, so both options route to screen 5.3.
-
 export function BehavioralProxy({
   onContinue,
+  onUnsure,
   onBack,
 }: {
   onContinue: () => void
+  onUnsure: () => void
   onBack: () => void
 }) {
   return (
@@ -76,7 +75,7 @@ export function BehavioralProxy({
         </button>
         <button
           type="button"
-          onClick={onContinue}
+          onClick={onUnsure}
           style={{
             height: 80,
             borderRadius: 16,
