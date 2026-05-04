@@ -6,7 +6,9 @@ import { Splash } from './screens/Splash'
 import { IspSelection } from './screens/IspSelection'
 import { Login } from './screens/Login'
 import { OtpVerification } from './screens/OtpVerification'
+import { AccountLoading } from './screens/AccountLoading'
 import { Home } from './screens/Home'
+import { startOutageCheck } from '@/lib/outageCheck'
 import { IssueSelection } from './screens/IssueSelection'
 import { OutageCheck } from './screens/OutageCheck'
 import { NoOutage } from './screens/NoOutage'
@@ -26,6 +28,7 @@ export type Screen =
   | 'isp'
   | 'login'
   | 'otp'
+  | 'account-loading'
   | 'home'
   | 'issue'
   | 'outage-check'
@@ -108,7 +111,16 @@ export function Onboarding() {
             <Login onContinue={() => go('otp')} onBack={() => go('isp', 'back')} />
           )}
           {screen === 'otp' && (
-            <OtpVerification onSuccess={() => go('home')} onBack={() => go('login', 'back')} />
+            <OtpVerification
+              onSuccess={() => {
+                startOutageCheck()
+                go('account-loading')
+              }}
+              onBack={() => go('login', 'back')}
+            />
+          )}
+          {screen === 'account-loading' && (
+            <AccountLoading onAdvance={() => go('home')} />
           )}
           {screen === 'home' && <Home onTroubleshoot={() => go('issue')} />}
           {screen === 'issue' && (

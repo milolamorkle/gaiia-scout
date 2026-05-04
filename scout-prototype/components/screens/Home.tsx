@@ -1,9 +1,12 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { tokens } from '@/lib/tokens'
 import { fixture } from '@/lib/fixture'
 import { IQ_FIBER } from '@/lib/isps'
 import { BottomNav } from '@/components/BottomNav'
+import { getOutageCheckRemainingMs } from '@/lib/outageCheck'
 
 const BOTTOM_NAV_HEIGHT = 56
 
@@ -24,7 +27,7 @@ export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
           padding: `0 ${tokens.space16}`,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
           backgroundColor: tokens.bg,
           borderBottom: `1px solid ${tokens.border}`,
           flexShrink: 0,
@@ -40,23 +43,6 @@ export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
           <span style={{ fontSize: 14, fontWeight: 500, color: tokens.textPrimary }}>
             IQ Fiber
           </span>
-        </div>
-        <div
-          aria-label={fixture.subscriber.name}
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            backgroundColor: tokens.ispPrimaryLight,
-            color: tokens.ispPrimary,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          SC
         </div>
       </header>
 
@@ -147,6 +133,8 @@ export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
           <RouterIcon />
         </section>
 
+        <OutageStatusCard />
+
         <div style={{ padding: `${tokens.space20} ${tokens.space16} 0` }}>
           <button
             type="button"
@@ -166,29 +154,6 @@ export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
             Troubleshoot an Issue
           </button>
         </div>
-
-        <div
-          style={{
-            marginTop: tokens.space20,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: tokens.space12,
-          }}
-        >
-          <button
-            type="button"
-            style={secondaryLinkStyle}
-          >
-            View account details
-          </button>
-          <button
-            type="button"
-            style={secondaryLinkStyle}
-          >
-            Billing & payments
-          </button>
-        </div>
       </div>
 
       <BottomNav active="home" />
@@ -196,13 +161,107 @@ export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
   )
 }
 
-const secondaryLinkStyle: React.CSSProperties = {
-  background: 'transparent',
-  border: 'none',
-  padding: 0,
-  fontSize: 14,
-  color: tokens.textMuted,
-  cursor: 'pointer',
+function OutageStatusCard() {
+  const [ready, setReady] = useState(() => getOutageCheckRemainingMs() === 0)
+
+  useEffect(() => {
+    if (ready) return
+    const t = window.setTimeout(() => setReady(true), getOutageCheckRemainingMs())
+    return () => window.clearTimeout(t)
+  }, [ready])
+
+  return (
+    <section
+      style={{
+        margin: `${tokens.space12} ${tokens.space16} 0`,
+        padding: tokens.space16,
+        borderRadius: 12,
+        backgroundColor: tokens.bgSecondary,
+      }}
+    >
+      <div style={{ display: 'grid' }}>
+        <motion.div
+          animate={{ opacity: ready ? 0 : 1 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            gridArea: '1 / 1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: tokens.space12,
+            pointerEvents: ready ? 'none' : 'auto',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: tokens.space8, minWidth: 0 }}>
+            <span
+              className="animate-pulse"
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: tokens.ispPrimary,
+                flexShrink: 0,
+              }}
+            />
+            <span style={{ fontSize: 14, color: tokens.textSecondary }}>
+              Checking for outages in your area…
+            </span>
+          </div>
+          <div
+            className="animate-spin"
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              border: `2px solid ${tokens.ispPrimaryLight}`,
+              borderTopColor: tokens.ispPrimary,
+              flexShrink: 0,
+            }}
+          />
+        </motion.div>
+
+        <motion.div
+          animate={{ opacity: ready ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            gridArea: '1 / 1',
+            pointerEvents: ready ? 'auto' : 'none',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: tokens.space8 }}>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: tokens.success,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: tokens.textPrimary,
+              }}
+            >
+              No outages in your area
+            </span>
+          </div>
+          <div
+            style={{
+              marginTop: tokens.space4,
+              marginLeft: 16,
+              fontSize: 12,
+              color: tokens.textMuted,
+            }}
+          >
+            Last checked just now
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  )
 }
 
 function RouterIcon() {
