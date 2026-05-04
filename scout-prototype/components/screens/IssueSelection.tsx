@@ -1,33 +1,37 @@
-'use client'
+"use client";
 
-import { tokens } from '@/lib/tokens'
-import { BackButton } from '@/components/BackButton'
-import { EscapeHatch } from '@/components/EscapeHatch'
+import { tokens } from "@/lib/tokens";
+import { BackButton } from "@/components/BackButton";
+import { EscapeHatch } from "@/components/EscapeHatch";
 
-type IssueKey = 'no-internet' | 'slow' | 'wifi-room' | 'other'
+type IssueKey = "no-internet" | "slow" | "wifi-room" | "other";
 
-const ISSUES: { key: IssueKey; label: string; Icon: () => React.JSX.Element }[] = [
-  { key: 'no-internet', label: 'No Internet', Icon: WifiOffIcon },
-  { key: 'slow', label: 'Slow Internet', Icon: SpeedometerIcon },
-  { key: 'wifi-room', label: 'Wi-Fi not reaching a room', Icon: SignalLowIcon },
-  { key: 'other', label: 'Something Else', Icon: QuestionIcon },
-]
+const ISSUES: {
+  key: IssueKey;
+  label: string;
+  Icon: () => React.JSX.Element;
+}[] = [
+  { key: "no-internet", label: "No Internet", Icon: WifiOffIcon },
+  { key: "slow", label: "Slow Internet", Icon: SpeedometerIcon },
+  { key: "wifi-room", label: "Wi-Fi not reaching a room", Icon: SignalLowIcon },
+  { key: "other", label: "Something Else", Icon: QuestionIcon },
+];
 
 export function IssueSelection({
   onSelectNoInternet,
   onBack,
 }: {
-  onSelectNoInternet: () => void
-  onBack: () => void
+  onSelectNoInternet: () => void;
+  onBack: () => void;
 }) {
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         inset: 0,
         backgroundColor: tokens.bg,
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <BackButton onBack={onBack} />
@@ -58,13 +62,13 @@ export function IssueSelection({
       <div
         style={{
           margin: `${tokens.space20} ${tokens.space16} 0`,
-          display: 'flex',
-          flexDirection: 'column',
+          display: "flex",
+          flexDirection: "column",
           gap: tokens.space12,
         }}
       >
         {ISSUES.map(({ key, label, Icon }) => {
-          const disabled = key !== 'no-internet'
+          const disabled = key !== "no-internet";
           return (
             <button
               key={key}
@@ -76,20 +80,20 @@ export function IssueSelection({
                 borderRadius: 12,
                 border: `1px solid ${tokens.border}`,
                 backgroundColor: tokens.bg,
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 padding: 0,
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                textAlign: 'left',
+                cursor: disabled ? "not-allowed" : "pointer",
+                textAlign: "left",
                 opacity: disabled ? 0.5 : 1,
               }}
             >
               <span
                 style={{
                   width: 44,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   marginLeft: tokens.space12,
                   color: tokens.ispPrimary,
                   flexShrink: 0,
@@ -99,10 +103,12 @@ export function IssueSelection({
               </span>
               <span
                 style={{
+                  flex: 1,
                   fontSize: tokens.fontMD,
                   color: tokens.textPrimary,
                   fontWeight: 500,
                   marginLeft: tokens.space8,
+                  minWidth: 0,
                 }}
               >
                 {label}
@@ -110,7 +116,7 @@ export function IssueSelection({
               {disabled && (
                 <span
                   style={{
-                    marginLeft: 'auto',
+                    marginLeft: "auto",
                     marginRight: tokens.space12,
                     backgroundColor: tokens.bgTertiary,
                     color: tokens.textMuted,
@@ -118,24 +124,36 @@ export function IssueSelection({
                     fontWeight: 500,
                     padding: `${tokens.space4} ${tokens.space8}`,
                     borderRadius: 999,
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Coming soon
                 </span>
               )}
             </button>
-          )
+          );
         })}
       </div>
 
       <div style={{ flex: 1 }} />
     </div>
-  )
+  );
 }
 
 function WifiOffIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
       <path d="M2 8.82a15 15 0 0 1 4.17-2.65" />
       <path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76" />
       <path d="M16.85 11.25a10 10 0 0 1 2.22 1.68" />
@@ -144,36 +162,82 @@ function WifiOffIcon() {
       <line x1="12" y1="20" x2="12.01" y2="20" />
       <line x1="2" y1="2" x2="22" y2="22" />
     </svg>
-  )
+  );
 }
 
 function SpeedometerIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
       <path d="M12 14a3 3 0 1 0 3-3" />
       <path d="M12 2a10 10 0 0 0-9.95 11" />
       <path d="M21.95 13A10 10 0 0 0 19 5.93" />
       <path d="M5.6 18.4A10 10 0 0 0 18.4 18.4" />
     </svg>
-  )
+  );
 }
 
 function SignalLowIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
       <rect x="3" y="17" width="3" height="4" rx="0.5" fill="currentColor" />
-      <rect x="9" y="13" width="3" height="8" rx="0.5" stroke="currentColor" opacity="0.3" />
-      <rect x="15" y="8" width="3" height="13" rx="0.5" stroke="currentColor" opacity="0.3" />
+      <rect
+        x="9"
+        y="13"
+        width="3"
+        height="8"
+        rx="0.5"
+        stroke="currentColor"
+        opacity="0.3"
+      />
+      <rect
+        x="15"
+        y="8"
+        width="3"
+        height="13"
+        rx="0.5"
+        stroke="currentColor"
+        opacity="0.3"
+      />
     </svg>
-  )
+  );
 }
 
 function QuestionIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
       <circle cx="12" cy="12" r="10" />
       <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4" />
       <line x1="12" y1="17" x2="12.01" y2="17" />
     </svg>
-  )
+  );
 }

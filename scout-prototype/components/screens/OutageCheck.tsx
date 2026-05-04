@@ -1,25 +1,27 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { tokens } from '@/lib/tokens'
-import { EscapeHatch } from '@/components/EscapeHatch'
+import { useEffect } from "react";
+import { tokens } from "@/lib/tokens";
+import { EscapeHatch } from "@/components/EscapeHatch";
+
+const OUTAGE_CHECK_DELAY_MS = 3500;
 
 export function OutageCheck({ onAdvance }: { onAdvance: () => void }) {
   useEffect(() => {
-    const id = setTimeout(onAdvance, 2000)
-    return () => clearTimeout(id)
-  }, [onAdvance])
+    const id = setTimeout(onAdvance, OUTAGE_CHECK_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [onAdvance]);
 
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         inset: 0,
         backgroundColor: tokens.bg,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         gap: tokens.space20,
       }}
     >
@@ -29,7 +31,7 @@ export function OutageCheck({ onAdvance }: { onAdvance: () => void }) {
         style={{
           width: 80,
           height: 80,
-          borderRadius: '50%',
+          borderRadius: "50%",
           backgroundColor: tokens.ispPrimary,
         }}
       />
@@ -37,12 +39,12 @@ export function OutageCheck({ onAdvance }: { onAdvance: () => void }) {
         style={{
           fontSize: tokens.fontBase,
           color: tokens.textSecondary,
-          textAlign: 'center',
+          textAlign: "center",
           padding: `0 ${tokens.space24}`,
         }}
       >
-        Checking your area for known issues…
+        Double-checking there&rsquo;s no outage in your area…
       </div>
     </div>
-  )
+  );
 }
