@@ -7,6 +7,18 @@ import { fixture } from '@/lib/fixture'
 
 export function Resolution({ onDone }: { onDone: () => void }) {
   const [rating, setRating] = useState(0)
+  const [feedback, setFeedback] = useState('')
+  const [feedbackFocused, setFeedbackFocused] = useState(false)
+  const [feedbackSent, setFeedbackSent] = useState(false)
+  const trimmedFeedback = feedback.trim()
+  const submitGrayed = trimmedFeedback.length === 0
+  const submitTappable = !submitGrayed && !feedbackSent
+
+  const handleSubmitFeedback = () => {
+    if (!submitTappable) return
+    setFeedbackSent(true)
+    setTimeout(() => setFeedbackSent(false), 1500)
+  }
 
   return (
     <div
@@ -99,7 +111,79 @@ export function Resolution({ onDone }: { onDone: () => void }) {
         </div>
       </div>
 
-      <div style={{ flex: 1 }} />
+      <div
+        style={{
+          marginTop: tokens.space20,
+          padding: `0 ${tokens.space16}`,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <label
+          htmlFor="resolution-feedback"
+          style={{
+            fontSize: 14,
+            color: tokens.textSecondary,
+            textAlign: 'left',
+          }}
+        >
+          Anything we could have explained better?
+        </label>
+        <textarea
+          id="resolution-feedback"
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          onFocus={() => setFeedbackFocused(true)}
+          onBlur={() => setFeedbackFocused(false)}
+          placeholder="Optional — your feedback helps us improve the instructions."
+          style={{
+            marginTop: tokens.space8,
+            width: '100%',
+            height: 80,
+            padding: tokens.space12,
+            borderRadius: 12,
+            border: `1px solid ${feedbackFocused ? tokens.ispPrimary : tokens.borderStrong}`,
+            outline: 'none',
+            boxShadow: feedbackFocused ? `0 0 0 3px ${tokens.ispPrimaryLight}` : 'none',
+            fontSize: 14,
+            fontFamily: 'inherit',
+            color: tokens.textPrimary,
+            backgroundColor: tokens.bg,
+            resize: 'none',
+            boxSizing: 'border-box',
+            transition: 'border-color 120ms ease, box-shadow 120ms ease',
+          }}
+        />
+        <div
+          style={{
+            marginTop: tokens.space12,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleSubmitFeedback}
+            disabled={!submitTappable}
+            style={{
+              height: 36,
+              padding: `0 ${tokens.space16}`,
+              borderRadius: 8,
+              border: `1px solid ${submitGrayed ? tokens.borderStrong : tokens.ispPrimary}`,
+              backgroundColor: tokens.bg,
+              color: submitGrayed ? tokens.textMuted : tokens.ispPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: submitTappable ? 'pointer' : 'not-allowed',
+              fontFamily: 'inherit',
+            }}
+          >
+            {feedbackSent ? '✓ Sent' : 'Submit feedback'}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, minHeight: tokens.space20 }} />
 
       <div style={{ padding: `${tokens.space20} ${tokens.space16}` }}>
         <button
