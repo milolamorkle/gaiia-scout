@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { tokens } from '@/lib/tokens'
 import { BackButton } from '@/components/BackButton'
 import { EscapeHatch } from '@/components/EscapeHatch'
@@ -21,22 +20,6 @@ export function IssueSelection({
   onSelectNoInternet: () => void
   onBack: () => void
 }) {
-  const [toast, setToast] = useState(false)
-
-  useEffect(() => {
-    if (!toast) return
-    const id = setTimeout(() => setToast(false), 2000)
-    return () => clearTimeout(id)
-  }, [toast])
-
-  const handleSelect = (key: IssueKey) => {
-    if (key === 'no-internet') {
-      onSelectNoInternet()
-      return
-    }
-    setToast(true)
-  }
-
   return (
     <div
       style={{
@@ -80,72 +63,72 @@ export function IssueSelection({
           gap: tokens.space12,
         }}
       >
-        {ISSUES.map(({ key, label, Icon }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => handleSelect(key)}
-            style={{
-              height: 72,
-              borderRadius: 12,
-              border: `1px solid ${tokens.border}`,
-              backgroundColor: tokens.bg,
-              display: 'flex',
-              alignItems: 'center',
-              padding: 0,
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span
+        {ISSUES.map(({ key, label, Icon }) => {
+          const disabled = key !== 'no-internet'
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={disabled ? undefined : onSelectNoInternet}
+              disabled={disabled}
               style={{
-                width: 44,
+                height: 72,
+                borderRadius: 12,
+                border: `1px solid ${tokens.border}`,
+                backgroundColor: tokens.bg,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: tokens.space12,
-                color: tokens.ispPrimary,
-                flexShrink: 0,
+                padding: 0,
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                textAlign: 'left',
+                opacity: disabled ? 0.5 : 1,
               }}
             >
-              <Icon />
-            </span>
-            <span
-              style={{
-                fontSize: tokens.fontMD,
-                color: tokens.textPrimary,
-                fontWeight: 500,
-                marginLeft: tokens.space8,
-              }}
-            >
-              {label}
-            </span>
-          </button>
-        ))}
+              <span
+                style={{
+                  width: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: tokens.space12,
+                  color: tokens.ispPrimary,
+                  flexShrink: 0,
+                }}
+              >
+                <Icon />
+              </span>
+              <span
+                style={{
+                  fontSize: tokens.fontMD,
+                  color: tokens.textPrimary,
+                  fontWeight: 500,
+                  marginLeft: tokens.space8,
+                }}
+              >
+                {label}
+              </span>
+              {disabled && (
+                <span
+                  style={{
+                    marginLeft: 'auto',
+                    marginRight: tokens.space12,
+                    backgroundColor: tokens.bgTertiary,
+                    color: tokens.textMuted,
+                    fontSize: tokens.fontXS,
+                    fontWeight: 500,
+                    padding: `${tokens.space4} ${tokens.space8}`,
+                    borderRadius: 999,
+                  }}
+                >
+                  Coming soon
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       <div style={{ flex: 1 }} />
-
-      {toast && (
-        <div
-          role="status"
-          style={{
-            position: 'absolute',
-            left: tokens.space16,
-            right: tokens.space16,
-            bottom: tokens.space24,
-            backgroundColor: tokens.textPrimary,
-            color: tokens.textInverse,
-            fontSize: tokens.fontSM,
-            padding: `${tokens.space12} ${tokens.space16}`,
-            borderRadius: 12,
-            textAlign: 'center',
-            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.18)',
-          }}
-        >
-          Coming soon in a future update
-        </div>
-      )}
     </div>
   )
 }
