@@ -66,6 +66,10 @@ export function Onboarding() {
   const [direction, setDirection] = useState<Direction>("forward");
   const [fixStepIndex, setFixStepIndex] = useState(0);
   const [bookedSlotId, setBookedSlotId] = useState<string>("a1");
+  const [photoPromptBackTarget, setPhotoPromptBackTarget] =
+    useState<Screen>("behavioral");
+  const [escalationBackTarget, setEscalationBackTarget] =
+    useState<Screen>("diagnosis");
 
   const go = (next: Screen, dir: Direction = "forward") => {
     setDirection(dir);
@@ -76,9 +80,25 @@ export function Onboarding() {
     go(tab);
   };
 
+  const logout = () => {
+    setFixStepIndex(0);
+    setBookedSlotId("a1");
+    go("isp", "back");
+  };
+
   const startFixFlow = () => {
     setFixStepIndex(0);
     go("fix-step");
+  };
+
+  const goPhotoPrompt = (from: Screen) => {
+    setPhotoPromptBackTarget(from);
+    go("photo-prompt");
+  };
+
+  const goEscalationIntro = (from: Screen) => {
+    setEscalationBackTarget(from);
+    go("escalation-intro");
   };
 
   const advanceFixStep = () => {
@@ -143,7 +163,9 @@ export function Onboarding() {
           {screen === "home" && (
             <Home onTroubleshoot={() => go("issue")} onNavigate={navigateTab} />
           )}
-          {screen === "account" && <Account onNavigate={navigateTab} />}
+          {screen === "account" && (
+            <Account onNavigate={navigateTab} onLogout={logout} />
+          )}
           {screen === "billing" && <Billing onNavigate={navigateTab} />}
           {screen === "issue" && (
             <IssueSelection
@@ -156,15 +178,15 @@ export function Onboarding() {
           )}
           {screen === "behavioral" && (
             <BehavioralProxy
-              onContinue={() => go("photo-prompt")}
+              onContinue={() => goPhotoPrompt("behavioral")}
               onUnsure={() => go("equipment-locator")}
               onBack={() => go("issue", "back")}
             />
           )}
           {screen === "equipment-locator" && (
             <EquipmentLocator
-              onFound={() => go("photo-prompt")}
-              onCantFind={() => go("escalation-intro")}
+              onFound={() => goPhotoPrompt("equipment-locator")}
+              onCantFind={() => goEscalationIntro("equipment-locator")}
               onBack={() => go("behavioral", "back")}
             />
           )}
@@ -172,7 +194,7 @@ export function Onboarding() {
             <DevicePhotoPrompt
               onTakePhoto={() => go("photo-analysis")}
               onAnswerQuestions={() => go("photo-analysis")}
-              onBack={() => go("behavioral", "back")}
+              onBack={() => go(photoPromptBackTarget, "back")}
             />
           )}
           {screen === "photo-analysis" && (
@@ -181,7 +203,7 @@ export function Onboarding() {
           {screen === "diagnosis" && (
             <Diagnosis
               onContinue={startFixFlow}
-              onSkipToBooking={() => go("escalation-intro")}
+              onSkipToBooking={() => goEscalationIntro("diagnosis")}
               onBack={() => go("photo-prompt", "back")}
             />
           )}
@@ -195,7 +217,9 @@ export function Onboarding() {
           {screen === "reconnection-wait" && (
             <ReconnectionWait
               onBackOnline={() => go("resolution")}
-              onStillNotReconnecting={() => go("escalation-intro")}
+              onStillNotReconnecting={() =>
+                goEscalationIntro("reconnection-wait")
+              }
             />
           )}
           {screen === "resolution" && (
@@ -209,7 +233,7 @@ export function Onboarding() {
           {screen === "escalation-intro" && (
             <EscalationIntro
               onBookAppointment={() => go("appointment-booking")}
-              onBack={() => go("diagnosis", "back")}
+              onBack={() => go(escalationBackTarget, "back")}
             />
           )}
           {screen === "appointment-booking" && (

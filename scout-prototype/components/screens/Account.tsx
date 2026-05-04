@@ -9,7 +9,11 @@ const BOTTOM_NAV_HEIGHT = 56;
 
 export function Account({
   onNavigate,
-}: { onNavigate?: (tab: Tab) => void } = {}) {
+  onLogout,
+}: {
+  onNavigate?: (tab: Tab) => void;
+  onLogout?: () => void;
+} = {}) {
   return (
     <div
       style={{
@@ -26,7 +30,7 @@ export function Account({
           padding: `0 ${tokens.space16}`,
           display: "flex",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           backgroundColor: tokens.bg,
           borderBottom: `1px solid ${tokens.border}`,
           flexShrink: 0,
@@ -47,6 +51,22 @@ export function Account({
             IQ Fiber
           </span>
         </div>
+        <button
+          type="button"
+          onClick={onLogout}
+          style={{
+            border: "none",
+            background: "transparent",
+            color: tokens.ispPrimary,
+            fontSize: 14,
+            fontWeight: 600,
+            fontFamily: "inherit",
+            cursor: "pointer",
+            padding: `${tokens.space8} 0`,
+          }}
+        >
+          Log out
+        </button>
       </header>
 
       <div

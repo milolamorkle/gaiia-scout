@@ -59,7 +59,7 @@ export function Resolution({ onDone }: { onDone: () => void }) {
             textAlign: 'center',
           }}
         >
-          Your {fixture.cpe.shortName} is connected. Here&rsquo;s what fixed it:
+          Your {fixture.cpe.shortName}{' '}is connected. Here&rsquo;s what fixed it:
         </p>
       </div>
 

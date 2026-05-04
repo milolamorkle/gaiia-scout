@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
-import { tokens } from '@/lib/tokens'
+import { tokens } from "@/lib/tokens";
 
 export function Splash({ onContinue }: { onContinue: () => void }) {
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         inset: 0,
         backgroundColor: tokens.bg,
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div
         style={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           padding: `${tokens.space48} ${tokens.space24} 0`,
         }}
       >
@@ -77,7 +77,7 @@ export function Splash({ onContinue }: { onContinue: () => void }) {
             color: tokens.ispPrimary,
             fontSize: 36,
             fontWeight: 700,
-            letterSpacing: '-0.02em',
+            letterSpacing: "-0.02em",
             lineHeight: 1,
           }}
         >
@@ -88,7 +88,7 @@ export function Splash({ onContinue }: { onContinue: () => void }) {
             marginTop: tokens.space12,
             color: tokens.textSecondary,
             fontSize: 15,
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           Internet support that actually helps.
@@ -99,20 +99,20 @@ export function Splash({ onContinue }: { onContinue: () => void }) {
           type="button"
           onClick={onContinue}
           style={{
-            width: '100%',
+            width: "100%",
             height: 56,
             borderRadius: 12,
-            border: 'none',
-            backgroundColor: tokens.ispPrimary,
-            color: tokens.textInverse,
+            border: "none",
+            backgroundColor: tokens.gaiiaPrimary,
+            color: tokens.textPrimary,
             fontSize: 16,
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: "pointer",
           }}
         >
           Get Started
         </button>
       </div>
     </div>
-  )
+  );
 }
