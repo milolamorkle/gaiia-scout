@@ -7,7 +7,7 @@ import { BottomNav } from '@/components/BottomNav'
 
 const BOTTOM_NAV_HEIGHT = 56
 
-export function Home() {
+export function Home({ onTroubleshoot }: { onTroubleshoot?: () => void } = {}) {
   return (
     <div
       style={{
@@ -150,6 +150,7 @@ export function Home() {
         <div style={{ padding: `${tokens.space20} ${tokens.space16} 0` }}>
           <button
             type="button"
+            onClick={onTroubleshoot}
             style={{
               width: '100%',
               height: 56,
