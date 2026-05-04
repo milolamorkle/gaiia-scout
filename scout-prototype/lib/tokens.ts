@@ -1,6 +1,9 @@
 export const tokens = {
   // Gaiia Brand
   gaiiaPrimary: "#D8E3D7",
+  gaiiaForeground: "#000000",
+  gaiiaBorder: "rgba(0, 0, 0, 0.24)",
+  gaiiaPressed: "rgba(0, 0, 0, 0.06)",
 
   // ISP Brand (loaded dynamically in real app — hardcoded in prototype)
   ispPrimary: "#5B21B6", // IQ Fiber purple — update this hex if iqfiber.com shows a different value
