@@ -75,16 +75,21 @@ export const ISP_LIST: Isp[] = [
 
 export const IQ_FIBER = ISP_LIST[0]
 
-const HUES = [210, 280, 340, 30, 160, 200, 50, 320, 100, 260]
+const FALLBACK_PALETTE = [
+  '#6366F1', // indigo
+  '#14B8A6', // teal
+  '#F59E0B', // amber
+  '#F43F5E', // rose
+  '#10B981', // emerald
+  '#8B5CF6', // violet
+]
 
-export function ispFallbackHue(id: string): number {
-  let h = 0
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
-  return HUES[h % HUES.length]
+export function ispFallbackColor(id: string): string {
+  let sum = 0
+  for (let i = 0; i < id.length; i++) sum += id.charCodeAt(i)
+  return FALLBACK_PALETTE[sum % FALLBACK_PALETTE.length]
 }
 
 export function ispInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[1][0]).toUpperCase()
+  return name.trim().slice(0, 2).toUpperCase()
 }

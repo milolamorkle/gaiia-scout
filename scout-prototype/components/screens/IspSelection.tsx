@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { tokens } from '@/lib/tokens'
-import { ISP_LIST, type Isp, ispFallbackHue, ispInitials } from '@/lib/isps'
+import { ISP_LIST, type Isp, ispFallbackColor, ispInitials } from '@/lib/isps'
 
 const FLASH_MS = 150
 
@@ -150,8 +150,8 @@ function IspRow({
                 lineHeight: 1.45,
               }}
             >
-              Ha! Good taste — but this prototype was only built for IQ Fiber. Give that one a tap
-              instead. 🙂
+              Looks like you&apos;re a {isp.name} customer — this prototype was built for IQ Fiber,
+              but Scout works just like this for your ISP too. Tap IQ Fiber to see the demo. 🙂
             </div>
           </motion.div>
         )}
@@ -170,9 +170,9 @@ function IspLogo({ isp }: { isp: Isp }) {
           width: 40,
           height: 40,
           borderRadius: 8,
-          backgroundColor: `hsl(${ispFallbackHue(isp.id)} 65% 50%)`,
+          backgroundColor: ispFallbackColor(isp.id),
           color: '#fff',
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
