@@ -6,7 +6,7 @@
 
 Each phase has two sections:
 
-**For you:** What you're doing, why, and any decisions you need to make before handing off to AI.
+**For you:** What you're doing, why, and any decisions to make before handing off to AI.
 
 **Prompt for AI:** Copy this directly into Claude Code (or Cursor). These are written to be self-contained — the AI gets all the context it needs in the prompt itself.
 
@@ -14,14 +14,14 @@ Each phase has two sections:
 
 ## Screens We're Building
 
-The full app has 44 screens. We're building 16, representing the complete no-internet diagnostic loop plus the escalation path. This is the right scope — it proves the thesis without sprawling.
+The full app has 44 screens. We're building 18, representing the complete no-internet diagnostic loop plus the escalation path.
 
-### Definite Builds (P0) — 16 screens
+### Definite Builds (P0)
 
 | ID | Screen Name | Notes |
 |---|---|---|
 | 1.1 | Splash | Scout logo, "Get Started" |
-| 1.2 | ISP Selection | Search + list, ISP branding loads on select |
+| 1.2 | ISP Selection | 10 real ISPs, only IQ Fiber selectable, cheeky inline message for others |
 | 1.3 | Login | Phone/email input, "Send Code" CTA |
 | 1.4 | OTP Verification | 6-digit input, auto-advance on correct entry |
 | 2.1 | Home Dashboard | Subscriber name, CPE, plan, status badge, primary CTA |
@@ -30,9 +30,9 @@ The full app has 44 screens. We're building 16, representing the complete no-int
 | 4.3 | No Outage Detected | Brief, auto-advances after 1.5s |
 | 5.1 | Behavioral Proxy | "Can you see your router?" Yes / No |
 | 5.3 | Device Photo Prompt | "Take a photo of your Ubiquiti router" + diagram |
-| 5.4 | Photo Analysis | Simulated — tap → 2s animation → scripted result |
+| 5.4 | Photo Analysis | Simulated — tap → 2.5s animation → scripted result |
 | 5.6 | AI Diagnosis | "Your router can't find an internet connection." → Fix CTA |
-| 5.7 | Fix Step (×2 screens) | Step 1: Unplug power. Step 2: Wait, then replug. |
+| 5.7 | Fix Steps ×3 | Step 1: Unplug. Step 2: 30s countdown. Step 3: Replug. |
 | 5.9 | Reconnection Wait | Animated, "Give it a minute…" + manual "It's back on" |
 | 5.10 | Resolution | "You're back online." + star rating |
 | 5.13 | Escalation Intro | "Let's get a technician out to you." |
@@ -43,39 +43,40 @@ The full app has 44 screens. We're building 16, representing the complete no-int
 
 | Screen | Why Cut |
 |---|---|
-| 1.5 Permissions | Browser permissions don't work the same way — confusing to simulate |
+| 1.5 Permissions | Browser permissions work differently — confusing to simulate |
 | 4.2 Outage Confirmed | Show the "no outage" path only — cleaner demo loop |
-| 5.2 Equipment Locator | P1 — the "can't find it" branch. Add if time allows |
-| 5.5 Yes/No LED fallback | P1 — fallback to photo flow. Add if time allows |
+| 5.2 Equipment Locator | P1 — "can't find it" branch. Add if time allows. |
+| 5.5 Yes/No LED fallback | P1 — fallback to photo flow. Add if time allows. |
 | 5.8 Step Photo Validation | Camera simulation adds complexity, skip in prototype |
-| 5.11–5.12 Ambiguous Steps | P1 — second outcome path. Add if time allows |
-| 5.15 Diagnostic Summary | P1 — collapsed disclosure panel. Add if time allows |
+| 5.11–5.12 Ambiguous Steps | P1 — second outcome path. Add if time allows. |
+| 5.15 Diagnostic Summary | P1 — collapsed disclosure panel. Add if time allows. |
 | 7.x Slow Internet | P2 — separate flow, defined in screen inventory |
 | 9.x Other Flow | P2 — separate flow, defined in screen inventory |
 
 ---
 
-## Fixture Data (Shared Across All Phases)
+## Fixture Data (Single Source of Truth)
 
-Everything in the prototype is hardcoded. No real APIs. This is the single source of truth — every prompt references it.
+Everything in the prototype is hardcoded. No real APIs. All phases reference this.
 
 ```
 ISP:
-  name: Uplink Internet
-  primaryColor: #0EA5E9
-  supportPhone: 1-800-465-5465
+  name: IQ Fiber
+  primaryColor: #5B21B6  ← verify at iqfiber.com before building (inspect their primary button color)
+  supportPhone: 1-833-474-3237
+  supportLabel: IQ Fiber Support
 
 Subscriber:
   name: Sarah Chen
-  plan: Uplink Fiber 500
-  downloadSpeed: 500 Mbps
-  uploadSpeed: 100 Mbps
+  plan: IQ Fiber Gig
+  downloadSpeed: 1000 Mbps
+  uploadSpeed: 1000 Mbps
   accountStatus: Active
 
 CPE:
   model: Ubiquiti UniFi Dream Machine
-  type: Gateway/Router combo
-  ports: [WAN (blue), LAN 1-4 (white), Power]
+  shortName: UniFi Dream Machine
+  type: Gateway/Router
 
 LED Diagnosis (scripted):
   result: "Your UniFi Dream Machine's WAN indicator is solid red."
@@ -84,15 +85,54 @@ LED Diagnosis (scripted):
 
 Fix Steps:
   Step 1: "Unplug the power cable from the back of your UniFi Dream Machine."
-  Step 2: "Wait 30 seconds, then plug it back in."
-  Step 3: (reconnection wait)
+           Subtext: "The power cable is on the right side of the back panel."
+  Step 2: Wait 30 seconds (countdown timer, isWait: true)
+           Subtext: "This gives your router time to fully reset."
+  Step 3: "Plug the power cable back in."
+           Subtext: "Your router will take about 60 seconds to restart."
 
 Appointment Slots:
-  - Thursday, May 7 — 9:00 AM to 11:00 AM
+  - Thursday, May 7 — 9:00 AM to 11:00 AM  [pre-selected]
   - Thursday, May 7 — 1:00 PM to 3:00 PM
   - Friday, May 8 — 10:00 AM to 12:00 PM
-  Confirmed slot (fixture): Thursday, May 7 — 9:00 AM to 11:00 AM
+  Confirmed slot: Thursday, May 7 — 9:00 AM to 11:00 AM
 ```
+
+---
+
+## ISP Selection Screen — Reference
+
+### The 10 ISPs
+
+**6 confirmed gaiia customers** — logos from gaiia's production CDN (stable URLs, verified May 2026):
+
+| # | Name | Logo URL |
+|---|---|---|
+| 1 | **IQ Fiber** ✅ selectable | `https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0c9abbccf0a51770761bc_logo-iqfiber.png` |
+| 2 | Resound Networks | `https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03c0735118df0c21dc5_logo-resound.png` |
+| 3 | Vistabeam | `https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03cfcd3e7bba80f5bcb_logo-vistabeam.png` |
+| 4 | Direct Communications | `https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03858560196ce1215ac_logo-directcomm.png` |
+| 5 | Intellipop | `https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03870c80f7c0964b6ab_logo-intellipop.png` |
+| 6 | LilaConnect | `https://logo.clearbit.com/lilaconnect.com` (fallback: teal square, "LC" initials) |
+
+**4 non-gaiia small ISPs** — via Clearbit logo API (free, no auth required):
+
+| # | Name | Logo URL |
+|---|---|---|
+| 7 | Ting Internet | `https://logo.clearbit.com/ting.com` |
+| 8 | Nextlink Internet | `https://logo.clearbit.com/nextlink.com` |
+| 9 | Crestview Networks | `https://logo.clearbit.com/crestviewnetworks.com` |
+| 10 | Wisper Internet | `https://logo.clearbit.com/wisperisp.com` |
+
+> **Clearbit fallback:** If `logo.clearbit.com/{domain}` returns a 404, render a colored square (hash of ISP name → consistent color) with 2-letter initials. Build this into the ISP tile component.
+
+### Cheeky message behavior
+- Slides open **inline below the tapped row** — Framer Motion height animation (0 → auto, 200ms ease-out)
+- Background: `#FFFBEB`, border: `1px solid #FDE68A`, radius: 12px, text: `#92400E`, 14px, 12px vertical / 16px horizontal padding
+- Copy: `"Ha! Good taste — but this prototype was only built for IQ Fiber. Give that one a tap instead. 🙂"`
+- Same message for all 9 non-IQ rows
+- Dismisses when user taps elsewhere or taps a different row
+- At most one message visible at a time
 
 ---
 
@@ -100,36 +140,38 @@ Appointment Slots:
 
 ### For you
 
-This is the only phase you do entirely yourself, without AI. Takes about 20 minutes.
+Do this entirely yourself. Takes about 20 minutes. No AI needed.
 
 1. **Create a GitHub repo** called `scout-prototype`. Make it public.
+
 2. **Bootstrap Next.js** locally:
-   ```
+   ```bash
    npx create-next-app@latest scout-prototype
    ```
    When prompted: TypeScript → Yes, Tailwind → Yes, App Router → Yes, everything else → defaults.
+
 3. **Push to GitHub:**
-   ```
+   ```bash
    cd scout-prototype
    git add .
    git commit -m "init"
    git push origin main
    ```
-4. **Connect to Vercel:**
-   - Go to vercel.com, sign up or log in with GitHub
-   - Click "Add New Project"
-   - Select `scout-prototype` from your repos
-   - Click Deploy — no config changes needed
-   - You'll have a live URL in under a minute (e.g. `scout-prototype.vercel.app`)
-   - Every push to `main` from here auto-deploys
 
-5. **Install one additional dependency** you'll need:
-   ```
+4. **Connect to Vercel:**
+   - Go to vercel.com, sign in with GitHub
+   - Click "Add New Project" → select `scout-prototype`
+   - Click Deploy — no config changes needed
+   - Live URL in under a minute (e.g. `scout-prototype.vercel.app`)
+   - Every push to `main` auto-deploys from here
+
+5. **Install dependencies:**
+   ```bash
    npm install framer-motion
    ```
-   This handles screen transitions. Push the updated `package.json`.
+   Push the updated `package.json`.
 
-That's it for Phase 0. You now have a live URL and automatic deploys.
+6. **Check IQ Fiber's brand color:** Open `iqfiber.com`, inspect their primary button, note the exact hex. Replace `#5B21B6` in the fixture data above if it differs. Everything inherits from that one value.
 
 ---
 
@@ -137,17 +179,11 @@ That's it for Phase 0. You now have a live URL and automatic deploys.
 
 ### For you
 
-Before Claude Code writes a single screen, it needs a design system to work within. Otherwise every screen looks different. This phase produces:
-- A phone frame component that wraps the whole app
-- A color/typography system
-- The fixture data file
-- Global layout
-
-Open Claude Code and start a new session. Paste the prompt below. Do not ask it to build any screens yet.
+Phase 1 is already done. This section is kept for reference only. Do not re-run this prompt — use Phase 1.5 to make corrections.
 
 ---
 
-### Prompt for Claude Code — Phase 1
+### Prompt for Claude Code — Phase 1 (already run — reference only)
 
 ```
 I'm building a mobile app prototype called Scout — a subscriber diagnostic app for internet service providers. The prototype will be a Next.js web app that simulates an iOS-style mobile experience inside a phone frame, viewed on desktop.
@@ -191,10 +227,10 @@ Create `lib/tokens.ts` with these values. Everything in the app uses these — n
 
 ```typescript
 export const tokens = {
-  // ISP Brand (loaded dynamically in real app — hardcoded in prototype)
-  ispPrimary: '#0EA5E9',        // Uplink Internet blue
-  ispPrimaryDark: '#0284C7',
-  ispPrimaryLight: '#E0F2FE',
+  // ISP Brand (hardcoded in prototype — would load dynamically in production)
+  ispPrimary: '#5B21B6',        // IQ Fiber purple — verify at iqfiber.com
+  ispPrimaryDark: '#4C1D95',
+  ispPrimaryLight: '#EDE9FE',
 
   // Neutrals
   bg: '#FFFFFF',
@@ -226,7 +262,7 @@ export const tokens = {
   fontXL: '24px',
   font2XL: '28px',
 
-  // Spacing (use these as px values in inline styles or Tailwind arbitrary values)
+  // Spacing
   space4: '4px',
   space8: '8px',
   space12: '12px',
@@ -247,17 +283,17 @@ Create `lib/fixture.ts` with this exact data:
 ```typescript
 export const fixture = {
   isp: {
-    name: 'Uplink Internet',
-    primaryColor: '#0EA5E9',
-    supportPhone: '1-800-465-5465',
-    supportLabel: 'Uplink Support',
+    name: 'IQ Fiber',
+    primaryColor: '#5B21B6',
+    supportPhone: '1-833-474-3237',
+    supportLabel: 'IQ Fiber Support',
   },
   subscriber: {
     name: 'Sarah Chen',
     firstName: 'Sarah',
-    plan: 'Uplink Fiber 500',
-    downloadSpeed: 500,
-    uploadSpeed: 100,
+    plan: 'IQ Fiber Gig',
+    downloadSpeed: 1000,
+    uploadSpeed: 1000,
     accountStatus: 'Active' as const,
   },
   cpe: {
@@ -266,8 +302,8 @@ export const fixture = {
     type: 'Gateway/Router',
   },
   diagnosis: {
-    ledResult: 'Your UniFi Dream Machine\'s WAN indicator is solid red.',
-    interpretation: 'This means your router is connected to power but can\'t reach the internet. This is usually fixable.',
+    ledResult: "Your UniFi Dream Machine's WAN indicator is solid red.",
+    interpretation: "This means your router is connected to power but can't reach the internet. This is usually fixable.",
     confidence: 'high' as const,
     outcome: 'fixable' as const,
   },
@@ -276,7 +312,6 @@ export const fixture = {
       id: 1,
       instruction: 'Unplug the power cable from the back of your UniFi Dream Machine.',
       subtext: 'The power cable is on the right side of the back panel.',
-      skipLabel: 'If the cable goes into the wall and won\'t reach, tap Skip',
     },
     {
       id: 2,
@@ -307,28 +342,100 @@ export const fixture = {
 
 ## 5. Global Components
 
-Create these small shared components. Keep them simple.
-
 **`components/BottomNav.tsx`**
 - Three tabs: Home (house icon), Account (person icon), Billing (receipt icon)
-- Home tab is active (blue), Account and Billing are muted gray with no interaction
-- Fixed at bottom of screen, 56px tall, white background, thin top border
-- Use SVG icons inline, no icon library
+- Home tab active (ispPrimary), Account and Billing muted gray, no interaction
+- Fixed at bottom, 56px tall, white background, thin top border
+- SVG icons inline, no icon library
 
 **`components/EscapeHatch.tsx`**
-- A small persistent link at the top of diagnostic screens: "Talk to a person →"
-- Tapping shows a simple overlay: "Call Uplink Support" with the phone number from fixture data
-- Styled as a small text link in ispPrimary color, positioned top-right inside the content area
+- Small persistent link: "Talk to a person →"
+- Tapping shows overlay: "Call IQ Fiber Support" with phone number from fixture
+- Styled as small text link in ispPrimary, top-right inside content area
 
 **`components/BackButton.tsx`**
-- Left-facing chevron + "Back" text in ispPrimary color
+- Left-facing chevron + "Back" in ispPrimary
 - Top-left of content area
-- Accepts an `onBack` prop (function) — parent handles navigation logic
-- Not shown on splash, login, or confirmation screens
+- Accepts `onBack` prop — parent handles navigation
+- Not shown on splash, login, OTP, or confirmation screens
+
+When done, app renders an empty phone frame on a dark background with status bar visible. No screens yet. Commit with message "phase-1: shell and design system".
+```
 
 ---
 
-When done, the app should render an empty phone frame on a dark background with the status bar visible. No screens yet — just the shell. Commit with message "phase-1: shell and design system".
+## Phase 1.5 — Brand and Fixture Corrections
+
+### For you
+
+Phase 1 was run with placeholder values. This phase makes two corrections before any screens are built:
+
+1. **IQ Fiber brand color** — verify the exact hex at `iqfiber.com` (inspect their primary button). The prompt uses `#5B21B6` as the assumed value — update it if your inspection shows something different before running.
+2. **Sweep for any stale values** — if Phase 1 output contained "Uplink Internet" or `#0EA5E9` anywhere, this prompt removes them.
+
+Run this in the same Claude Code session before moving to Phase 2.
+
+---
+
+### Prompt for Claude Code — Phase 1.5
+
+```
+The Scout prototype shell was just built in Phase 1. Before building any screens, I need to correct the fixture data and design tokens to use the confirmed ISP values.
+
+**Task: Update lib/fixture.ts and lib/tokens.ts only. Do not touch any other files.**
+
+---
+
+## Updates to lib/tokens.ts
+
+Replace the three isp token values with:
+
+```typescript
+ispPrimary: '#5B21B6',       // IQ Fiber purple — update this hex if iqfiber.com shows a different value
+ispPrimaryDark: '#4C1D95',
+ispPrimaryLight: '#EDE9FE',
+```
+
+---
+
+## Updates to lib/fixture.ts
+
+Replace the entire `isp` object with:
+
+```typescript
+isp: {
+  name: 'IQ Fiber',
+  primaryColor: '#5B21B6',      // must match tokens.ispPrimary exactly
+  supportPhone: '1-833-474-3237',
+  supportLabel: 'IQ Fiber Support',
+},
+```
+
+Replace the `subscriber` object with:
+
+```typescript
+subscriber: {
+  name: 'Sarah Chen',
+  firstName: 'Sarah',
+  plan: 'IQ Fiber Gig',
+  downloadSpeed: 1000,
+  uploadSpeed: 1000,
+  accountStatus: 'Active' as const,
+},
+```
+
+All other fixture values (cpe, diagnosis, fixSteps, appointmentSlots, confirmedAppointment) stay unchanged.
+
+---
+
+## Verification
+
+After changes:
+- Search the entire codebase for "Uplink" — remove or replace any occurrences
+- Search for "#0EA5E9" — replace with "#5B21B6" if found
+- Confirm `fixture.isp.primaryColor` matches `tokens.ispPrimary`
+
+Commit with message "phase-1.5: IQ Fiber brand update".
 ```
 
 ---
@@ -337,16 +444,14 @@ When done, the app should render an empty phone frame on a dark background with 
 
 ### For you
 
-Once Phase 1 is committed and deployed, start a new Claude Code session. This phase covers everything from splash through to the home dashboard — the first thing a user sees.
-
-One decision to make: the OTP screen should have a "correct" code for the demo. Use `123456`. Any other input shows a shake animation and "Incorrect code" error. This avoids needing any backend.
+Covers splash through home dashboard. The OTP correct code is `123456` — any other input shakes and errors. No backend needed.
 
 ---
 
 ### Prompt for Claude Code — Phase 2
 
 ```
-I'm continuing work on the Scout prototype (Next.js, TypeScript, Tailwind, Framer Motion). The shell, design tokens, and fixture data are already built in Phase 1. Do not recreate those files — import from `lib/tokens.ts` and `lib/fixture.ts` wherever needed.
+Continuing work on the Scout prototype (Next.js, TypeScript, Tailwind, Framer Motion). Shell, design tokens, and fixture data are built in Phase 1/1.5. Import from `lib/tokens.ts` and `lib/fixture.ts` — do not recreate those files.
 
 **Task: Build the onboarding flow — screens 1.1 through 2.1.**
 
@@ -354,93 +459,174 @@ I'm continuing work on the Scout prototype (Next.js, TypeScript, Tailwind, Frame
 
 ## Navigation Model
 
-The entire app is a single page. Use a `currentScreen` state variable in `app/page.tsx` to track which screen is showing. Transitions between screens use Framer Motion's `AnimatePresence` with a simple slide-left animation (new screen slides in from right, old screen exits to left). This creates the feel of navigating forward in a native app.
-
-For "back" navigation, slide in the opposite direction.
+Entire app is a single page. Use `currentScreen` state in `app/page.tsx`. Transitions use Framer Motion `AnimatePresence` — forward navigation slides new screen in from right, old screen exits left. Back reverses direction.
 
 ---
 
 ## Screen 1.1 — Splash
 
 - White background
-- Centered vertically: Scout wordmark ("scout") in ispPrimary color, large (36px), lowercase, Inter font, font-weight 700
-- Tagline below: "Internet support that actually helps." in textSecondary, 15px
-- "Get Started" button at bottom: full-width, ispPrimary background, white text, 16px font, 56px tall, 12px border radius, 24px horizontal margin
+- Centered vertically: "scout" wordmark in ispPrimary, 36px, lowercase, Inter, font-weight 700
+- Tagline: "Internet support that actually helps." textSecondary, 15px, below wordmark
+- "Get Started" button pinned near bottom: full-width, ispPrimary background, white text, 16px, 56px tall, 12px radius, 24px horizontal margin
 - No back button, no escape hatch, no nav
-- Tap "Get Started" → screen 1.2
+- Tap → screen 1.2
 
 ---
 
 ## Screen 1.2 — ISP Selection
 
-- Header: "Who's your internet provider?" in textPrimary, 24px, 28px top padding
-- Search input below header: placeholder "Search providers…", border in borderStrong color, 12px radius, 44px tall
-- List of ISP tiles below search (hardcoded — do not wire up search filtering):
-  - Tile 1: "Uplink Internet" — show a colored square (ispPrimary) as logo placeholder, ISP name in textPrimary
-  - Tile 2: "Clearwave Fiber" — gray square placeholder
-  - Tile 3: "Ridgeline Wireless" — gray square placeholder
-  - Tile 4: "Summit Broadband" — gray square placeholder
-- Each tile: full width, 64px tall, horizontal layout (logo 40px square + name), separated by thin borders
-- Tapping "Uplink Internet" → screen 1.3 (other tiles do nothing)
-- Below list: small muted link — "My provider isn't listed" in textMuted color, centered, 14px
+- Header: "Who's your internet provider?" textPrimary, 24px, 28px top, 16px horizontal padding
+- Search input: placeholder "Search providers…", borderStrong border, 12px radius, 44px tall, 16px margin
+  - Real-time client-side filter on ISP name, case-insensitive
+- Scrollable list of 10 ISPs below search
+
+**ISP list — hardcode in this exact order:**
+
+```typescript
+const ISP_LIST = [
+  {
+    id: 'iqfiber',
+    name: 'IQ Fiber',
+    logoUrl: 'https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0c9abbccf0a51770761bc_logo-iqfiber.png',
+    selectable: true,
+  },
+  {
+    id: 'resound',
+    name: 'Resound Networks',
+    logoUrl: 'https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03c0735118df0c21dc5_logo-resound.png',
+    selectable: false,
+  },
+  {
+    id: 'vistabeam',
+    name: 'Vistabeam',
+    logoUrl: 'https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03cfcd3e7bba80f5bcb_logo-vistabeam.png',
+    selectable: false,
+  },
+  {
+    id: 'directcomm',
+    name: 'Direct Communications',
+    logoUrl: 'https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03858560196ce1215ac_logo-directcomm.png',
+    selectable: false,
+  },
+  {
+    id: 'intellipop',
+    name: 'Intellipop',
+    logoUrl: 'https://cdn.prod.website-files.com/685d8548ff18f67e0ca8eebe/68b0b03870c80f7c0964b6ab_logo-intellipop.png',
+    selectable: false,
+  },
+  {
+    id: 'lilaconnect',
+    name: 'LilaConnect',
+    logoUrl: 'https://logo.clearbit.com/lilaconnect.com',
+    selectable: false,
+  },
+  {
+    id: 'ting',
+    name: 'Ting Internet',
+    logoUrl: 'https://logo.clearbit.com/ting.com',
+    selectable: false,
+  },
+  {
+    id: 'nextlink',
+    name: 'Nextlink Internet',
+    logoUrl: 'https://logo.clearbit.com/nextlink.com',
+    selectable: false,
+  },
+  {
+    id: 'crestview',
+    name: 'Crestview Networks',
+    logoUrl: 'https://logo.clearbit.com/crestviewnetworks.com',
+    selectable: false,
+  },
+  {
+    id: 'wisper',
+    name: 'Wisper Internet',
+    logoUrl: 'https://logo.clearbit.com/wisperisp.com',
+    selectable: false,
+  },
+]
+```
+
+**Row component:**
+- 64px tall, full-width tap target, 16px horizontal padding
+- Logo: 40×40px left-aligned, object-fit: contain
+- Logo error fallback: on `onError`, render a 40×40px colored square (use a simple hash of the ISP id to pick a consistent hue) with 2-letter initials in white, 14px, centered
+- ISP name: 15px, textPrimary, 12px gap from logo
+- 1px bottom border in border color
+
+**Selection behavior:**
+
+Tapping IQ Fiber (`selectable: true`):
+- Navigate to screen 1.3
+
+Tapping any other ISP (`selectable: false`):
+- Row flashes bgTertiary, 150ms, returns to white
+- Inline message slides open below the tapped row: Framer Motion `AnimatePresence`, height 0 → auto, 200ms ease-out
+- Message: "Ha! Good taste — but this prototype was only built for IQ Fiber. Give that one a tap instead. 🙂"
+- Message box: background `#FFFBEB`, border `1px solid #FDE68A`, radius 12px, text `#92400E`, 14px, 12px vertical / 16px horizontal padding
+- State: `activeMessageId: string | null`
+- Tapping elsewhere or a different row: close current message (height → 0), open new one if applicable
+- Only one message visible at a time
+
+Below list: "My provider isn't listed" textMuted, 14px, centered, 16px top margin — tapping does nothing.
 
 ---
 
 ## Screen 1.3 — Login
 
-- Uplink Internet branding at top: show the colored square logo (40px) + "Uplink Internet" name centered, 32px top padding
-- Below branding: "Sign in to your account" in textPrimary, 20px, centered
-- Toggle between Phone and Email input (two pill-shaped toggle options side by side, ispPrimary active state)
-- Input field below toggle: placeholder "Phone number" or "Email address" depending on toggle
-- "Send Verification Code" button: same style as splash CTA button
-- Any input value is accepted — button always proceeds
-- Tap "Send Verification Code" → screen 1.4
+- IQ Fiber logo (40px, from ISP_LIST logoUrl) + "IQ Fiber" centered at top, 32px top padding
+- "Sign in to your account" textPrimary, 20px, centered, 16px below branding
+- Toggle: Phone / Email — two pill options side by side, ispPrimary active, bgTertiary inactive
+- Input field: placeholder updates with toggle
+- "Send Verification Code" button: same style as splash CTA
+- Any input accepted — always advances
+- Tap → screen 1.4
 - Back button present, no escape hatch
 
 ---
 
 ## Screen 1.4 — OTP Verification
 
-- "Check your messages" header, 22px
-- Subtext: "We sent a 6-digit code to the number you entered." in textSecondary
-- 6-digit code input: six individual boxes side by side, each 44px wide × 56px tall, border in borderStrong, large centered text, auto-focus first box, tab/advance on each digit entry
-- Correct code: 123456
-  - On correct: brief green flash on all boxes, then auto-advance to screen 2.1
-- Incorrect code: boxes shake (Framer Motion), brief red border, "Incorrect code — try again" text appears below
-- "Resend code" link appears after 10 seconds (shortened from 30s for demo), textMuted color, becomes active (ispPrimary) when timer expires
+- "Check your messages" textPrimary, 22px, 28px top
+- Subtext: "We sent a 6-digit code to the number you entered." textSecondary, 15px
+- 6 individual input boxes side by side: each 44px wide × 56px tall, borderStrong border, large centered text
+  - Auto-focus first box, auto-advance on each digit entry
+- Correct code: `123456`
+  - On correct: all boxes flash green border, advance to screen 2.1
+- Incorrect code: boxes shake (Framer Motion x keyframe), red border briefly, "Incorrect code — try again" in error color below
+- "Resend code" appears after 10 seconds: starts textMuted, becomes ispPrimary and tappable when timer expires
 - Back button present
 
 ---
 
 ## Screen 2.1 — Home Dashboard
 
-This is the "logged in" state and the most information-dense screen in the onboarding flow. Get this one right — it establishes what the product is.
+**Layout top to bottom:**
 
-**Layout (top to bottom):**
+1. ISP header bar (56px, white, bottom border):
+   - Left: IQ Fiber logo 28px + "IQ Fiber" textPrimary, 14px, font-weight 500
+   - Right: circle avatar "SC", 32px, ispPrimaryLight bg, ispPrimary text
 
-1. ISP header bar: Uplink Internet logo square + "Uplink Internet" name on left, small account avatar circle (initials "SC" for Sarah Chen) on right. Height 56px, white background, bottom border.
+2. Status card (16px margin, 12px radius, bgSecondary, 16px padding):
+   - Badge: pill, successLight bg, success text, "Active"
+   - Name: "Sarah Chen" textPrimary, 18px, font-weight 600
+   - Plan: "IQ Fiber Gig" textSecondary, 14px
+   - Speed: "1,000 Mbps down / 1,000 Mbps up" textMuted, 13px
 
-2. Status card: 16px horizontal margin, rounded card (12px radius), bgSecondary background, 16px padding
-   - Account status badge: small pill, success green background, "Active" text in success color
-   - Subscriber name: "Sarah Chen" in textPrimary, 18px, font-weight 600
-   - Plan: "Uplink Fiber 500" in textSecondary, 14px
-   - Speed: "500 Mbps down / 100 Mbps up" in textMuted, 13px
+3. Equipment card (16px margin, 12px radius, bgSecondary, 16px padding, 12px below status card):
+   - Label: "YOUR EQUIPMENT" textMuted, 11px, letter-spacing 0.08em
+   - Model: "Ubiquiti UniFi Dream Machine" textPrimary, 15px
+   - Type: "Gateway / Router" textMuted, 13px
+   - Simple router SVG (box + two antenna lines), 32px, textMuted, right-aligned
 
-3. Equipment card: same margin/style as status card, below status card with 12px gap
-   - Label: "Your Equipment" in textSecondary, 12px, uppercase, letter-spacing
-   - Equipment name: "Ubiquiti UniFi Dream Machine" in textPrimary, 15px
-   - Type: "Gateway / Router" in textMuted, 13px
-   - Small router icon (SVG, keep it simple — a box with antenna lines) on the right
+4. Primary CTA: "Troubleshoot an Issue" — full width, ispPrimary, 56px, 16px, 16px horizontal margin, 20px top
 
-4. Primary CTA: "Troubleshoot an Issue" button — full width, ispPrimary background, white text, 56px tall, 16px font, 16px horizontal margin, 20px top margin. This is the most prominent element on the screen.
+5. Secondary links (textMuted, 14px, centered, 12px gap):
+   - "View account details" — tap does nothing
+   - "Billing & payments" — tap does nothing
 
-5. Secondary links below CTA (muted, textMuted, 14px, centered):
-   - "View account details" (does nothing)
-   - "Billing & payments" (does nothing)
-
-6. Bottom nav (from BottomNav component)
-
-No back button on this screen. EscapeHatch not shown here (only on diagnostic screens).
+6. BottomNav pinned at bottom
 ```
 
 ---
@@ -449,16 +635,14 @@ No back button on this screen. EscapeHatch not shown here (only on diagnostic sc
 
 ### For you
 
-This phase covers intake through AI diagnosis — the heart of the product. The "AI" in screen 5.4 is pure simulation: user taps the camera button, sees a 2-second loading animation with two sequential status messages, then gets the scripted result from fixture data. Do not wire up any real camera or AI API.
-
-The most important screen in this phase is 5.6 (AI Diagnosis). It's the moment the product proves its value. Make sure the copy matches the fixture data exactly.
+The core of the product. Screen 5.4 is pure simulation — tapping "Take Photo" routes directly to the scripted analysis sequence. No camera opens. Screen 5.6 is the most important screen in the prototype; get the copy right.
 
 ---
 
 ### Prompt for Claude Code — Phase 3
 
 ```
-Continuing the Scout prototype. Phase 1 (shell) and Phase 2 (onboarding) are complete. Import from `lib/tokens.ts` and `lib/fixture.ts` as needed. Add new screens to the existing navigation model in `app/page.tsx`.
+Continuing the Scout prototype. Phases 1, 1.5, and 2 are complete. Import from lib/tokens.ts and lib/fixture.ts as needed. Add new screens to the existing navigation model in app/page.tsx.
 
 **Task: Build the diagnostic intake flow — screens 3.1 through 5.6.**
 
@@ -466,109 +650,106 @@ Continuing the Scout prototype. Phase 1 (shell) and Phase 2 (onboarding) are com
 
 ## Screen 3.1 — Issue Selection
 
-- Header: "What's happening?" in textPrimary, 24px, 28px top padding, 16px horizontal padding
-- Subtext: "Choose the option that best describes the issue." in textSecondary, 15px
-- Four large tap targets below, stacked vertically, 16px horizontal margin, 12px gap between:
-  - "No Internet" — icon: wifi with X through it
-  - "Slow Internet" — icon: speedometer or turtle (simple SVG)
-  - "Wi-Fi not reaching a room" — icon: signal bars low
-  - "Something Else" — icon: question mark circle
-- Each target: white background, 1px border in border color, 12px radius, 72px tall, horizontal layout (icon left 44px + label text left-aligned 17px textPrimary)
+- Header: "What's happening?" textPrimary, 24px, 28px top, 16px padding
+- Subtext: "Choose the option that best describes the issue." textSecondary, 15px
+- Four tap targets, stacked, 16px margin, 12px gap:
+  - "No Internet" — wifi-off icon
+  - "Slow Internet" — speedometer icon
+  - "Wi-Fi not reaching a room" — low signal bars icon
+  - "Something Else" — question mark circle icon
+- Each: white bg, 1px border, 12px radius, 72px tall, icon (44px left zone) + label (17px, textPrimary)
 - Tapping "No Internet" → screen 4.1
-- Tapping anything else: show a brief toast or inline text "Coming soon in a future update" — do not route anywhere
-- Back button present, EscapeHatch present
+- Tapping anything else: inline toast at bottom — "Coming soon in a future update" — dismisses after 2 seconds
+- Back button, EscapeHatch present
 
 ---
 
 ## Screen 4.1 — Outage Check Loading
 
-- Full screen, white background
-- Centered vertically: animated pulse circle (ispPrimary color, 80px, CSS pulse animation)
-- Below animation: "Checking your area for known issues…" in textSecondary, 15px, centered
-- Automatically advances to screen 4.3 after 2 seconds (setTimeout)
-- No user interaction on this screen
-- No back button, EscapeHatch present
+- Full screen white
+- Centered: pulsing circle, ispPrimary, 80px, CSS animate-pulse
+- Below: "Checking your area for known issues…" textSecondary, 15px, centered
+- Auto-advances to screen 4.3 after 2 seconds
+- No interaction, no back button, EscapeHatch present
 
 ---
 
 ## Screen 4.3 — No Outage Detected
 
 - Centered vertically
-- Green checkmark icon (40px, success color)
-- "No outages in your area" in textPrimary, 20px, centered, below icon
-- Subtext: "Your service is running normally. Let's check your equipment." in textSecondary, 15px, centered
-- Automatically advances to screen 5.1 after 1.5 seconds
-- No user interaction
-- No back button, EscapeHatch present
+- Green checkmark icon, 40px, success color
+- "No outages in your area" textPrimary, 20px, centered, 12px below icon
+- Subtext: "Your service is running normally. Let's check your equipment." textSecondary, 15px, centered
+- Auto-advances to screen 5.1 after 1.5 seconds
+- No interaction, no back button, EscapeHatch present
 
 ---
 
 ## Screen 5.1 — Behavioral Proxy
 
-- Header: "Before we start—" in textPrimary, 22px, 28px top padding, 16px padding
-- Question below: "Can you see your router or modem right now?" in textPrimary, 18px, font-weight 500
-- Two large tap targets below, 16px margin, 12px gap:
-  - "Yes, I can see it" — primary option, ispPrimary border, ispPrimaryLight background
-  - "No, I'm not sure where it is" — secondary option, standard border
-- Each tap target: 80px tall, 16px radius, centered text, 17px font
-- Tapping "Yes, I can see it" → screen 5.3
-- Tapping "No, I'm not sure where it is" → also route to screen 5.3 (Equipment Locator screen 5.2 is out of prototype scope — simplify the branch)
-- Back button present, EscapeHatch present
+- "Before we start—" textPrimary, 22px, 28px top, 16px padding
+- Question: "Can you see your router or modem right now?" textPrimary, 18px, font-weight 500, 16px top
+- Two tap targets, 16px margin, 12px gap:
+  - "Yes, I can see it" — ispPrimary border, ispPrimaryLight bg
+  - "No, I'm not sure where it is" — standard border, white bg
+- Each: 80px tall, 16px radius, centered text, 17px
+- Both route to screen 5.3 (note in comment: "No" would normally route to Equipment Locator — out of prototype scope)
+- Back button, EscapeHatch present
 
 ---
 
 ## Screen 5.3 — Device Photo Prompt
 
-- Header: "Take a photo of your router" in textPrimary, 22px, 24px top padding, 16px padding
-- Device name below: "Ubiquiti UniFi Dream Machine" in ispPrimary, 15px, font-weight 500
-- Instruction: "Point your camera at the front of your router so the indicator lights are clearly visible." in textSecondary, 15px, 16px top margin
-- Diagram placeholder: a rounded rectangle (280px × 180px, bgTertiary background, dashed border in borderStrong), centered, 24px vertical margin. Inside: simple router SVG outline (just a box shape with a few light dots on front). Below diagram in textMuted 13px: "Front of device, lights visible"
-- Primary CTA button: "Take Photo" — full width, ispPrimary, 56px tall, camera icon + text
-- Secondary link below button: "Answer questions instead →" in textSecondary, 14px, centered — routes to screen 5.3 fallback (but in this prototype, this also routes forward to 5.4 to keep the loop clean — note in a code comment that this would normally route to the yes/no LED question flow)
-- Back button present, EscapeHatch present
+- Header: "Take a photo of your router" textPrimary, 22px, 24px top, 16px padding
+- Device name: "Ubiquiti UniFi Dream Machine" ispPrimary, 15px, font-weight 500, 4px below header
+- Instruction: "Point your camera at the front of your router so the indicator lights are clearly visible." textSecondary, 15px, 16px top
+- Diagram: rounded rect 280×180px, bgTertiary, dashed borderStrong, centered, 24px vertical margin
+  - Inside: simple SVG router outline (box + small LED dots on front)
+  - Below diagram: "Front of device, lights visible" textMuted, 13px, centered
+- CTA: "Take Photo" — full width, ispPrimary, 56px, camera icon + text
+- Secondary: "Answer questions instead →" textSecondary, 14px, centered — routes to 5.4 in prototype (note: would normally route to yes/no LED flow)
+- Back button, EscapeHatch present
 
 ---
 
 ## Screen 5.4 — Photo Analysis (Simulated)
 
-This is the AI showcase moment. The camera never actually opens. Tapping "Take Photo" on 5.3 goes directly to this screen, which simulates the analysis.
+No camera opens. Tapping "Take Photo" on 5.3 routes directly here.
 
-**Phase 1 of this screen (Analysis in progress):**
-- Dark overlay background (#0f0f0f) — full screen
-- Centered: animated scanning graphic (a rectangle outline with a moving horizontal scan line, ispPrimary color — pure CSS animation)
-- Below graphic: sequential status messages that appear one at a time with a 1-second delay between:
-  1. "Identifying device…" (appears immediately)
-  2. "Reading indicator lights…" (appears after 1.2s)
-- Each message: white text, 15px, centered, with a small spinner or checkmark when complete
-- After 2.5 seconds total → transition to Phase 2 of this screen
+**Phase 1 — Analysis in progress (0 to 2.5 seconds):**
+- Background: #0f0f0f, full screen
+- Centered: scanning animation — rect outline 240×160px, ispPrimary border, horizontal scan line moving top→bottom, CSS animation looping
+- Sequential messages below, white text, 15px, centered:
+  - "Identifying device…" — appears immediately with spinner
+  - Spinner → checkmark at 1.2s
+  - "Reading indicator lights…" — appears at 1.2s with spinner
+  - Spinner → checkmark at 2.3s
+- At 2.5s → transition to Phase 2
 
-**Phase 2 of this screen (Result):**
+**Phase 2 — Result:**
 - White background returns
-- At top: small green pill badge "Analysis complete" 
-- LED result (from fixture): "Your UniFi Dream Machine's WAN indicator is solid red." in textPrimary, 17px, font-weight 500, 16px padding
-- Interpretation (from fixture): "This means your router is connected to power but can't reach the internet. This is usually fixable." in textSecondary, 15px, 16px top margin
-- After 1 second, a "Continue →" button fades in at bottom — full width, ispPrimary, 56px tall
-- Tap "Continue" → screen 5.6
-- EscapeHatch present, no back button during analysis
+- Green pill badge: "Analysis complete" successLight bg, success text, 13px
+- LED result from fixture: "Your UniFi Dream Machine's WAN indicator is solid red." textPrimary, 17px, font-weight 500, 16px padding
+- Interpretation from fixture: "This means your router is connected to power but can't reach the internet. This is usually fixable." textSecondary, 15px, 12px top
+- "Continue →" fades in after 1s: full width, ispPrimary, 56px → screen 5.6
+- No back button during analysis. EscapeHatch on Phase 2 only.
 
 ---
 
 ## Screen 5.6 — AI Diagnosis
 
-This screen routes to either the fix flow or escalation. In the prototype, always route to the fix flow.
-
-- Header: "Here's what we found" in textPrimary, 22px, 28px top, 16px padding
-- Diagnosis card: white card with ispPrimary left border (4px), bgSecondary background, 16px padding, 12px radius, 16px margin
-  - Title: "Connection issue detected" in textPrimary, 16px, font-weight 600
-  - Body: "Your router is online but can't reach the internet. This is the most common type of home internet problem, and most people fix it in under 3 minutes." in textSecondary, 15px, 8px top margin
-- Below card: "What we'll do:" label in textSecondary, 13px uppercase, 20px top margin
-- Three-item checklist below (simple checkmark icons in ispPrimary):
+- Header: "Here's what we found" textPrimary, 22px, 28px top, 16px padding
+- Diagnosis card: bgSecondary, 4px ispPrimary left border, 12px radius, 16px padding, 16px margin
+  - Title: "Connection issue detected" textPrimary, 16px, font-weight 600
+  - Body: "Your router is online but can't reach the internet. This is the most common type of home internet problem, and most people fix it in under 3 minutes." textSecondary, 15px, 8px top
+- "What we'll do:" textMuted, 12px, uppercase, letter-spacing 0.08em, 20px top, 16px padding
+- Three checklist items (ispPrimary checkmark + text, 15px textSecondary, 10px gap):
   - "Restart your router the right way"
   - "Confirm your connection comes back"
   - "Book a tech if it doesn't"
-- Primary CTA: "Let's fix it" — full width, ispPrimary, 56px tall, 20px top margin
-- Secondary link: "Skip to booking a technician →" in textMuted, 14px, centered below CTA — routes to screen 5.13
-- Back button present, EscapeHatch present
+- CTA: "Let's fix it" — full width, ispPrimary, 56px, 20px top, 16px margin
+- Secondary: "Skip to booking a technician →" textMuted, 14px, centered, 12px below CTA → screen 5.13
+- Back button, EscapeHatch present
 ```
 
 ---
@@ -577,7 +758,7 @@ This screen routes to either the fix flow or escalation. In the prototype, alway
 
 ### For you
 
-This phase builds the guided fix sequence. Steps come directly from `fixture.fixSteps`. Step 2 has a built-in 30-second countdown (the "wait" step) — this is a high-value demo moment, don't skip it. The reconnection wait screen (5.9) should have a manual "It's back on" button since we can't actually detect Wi-Fi.
+Step 2 has the 30-second countdown — the highest-value UX moment in the fix flow. Don't skip it. The reconnection wait uses a 5-second delay before showing the manual button (we can't detect real Wi-Fi).
 
 ---
 
@@ -590,57 +771,54 @@ Continuing Scout prototype. Phases 1–3 complete. Import fixture data as needed
 
 ---
 
-## Screen 5.7 — Fix Steps (Rendered 3 times, one per step)
+## Screen 5.7 — Fix Steps (single component, rendered 3 times)
 
-Use a single `FixStep` component that accepts step data from `fixture.fixSteps` and a step index. The parent screen tracks current step.
+Build a FixStep component. Parent tracks currentStep (0, 1, 2) in app/page.tsx.
 
-**Layout:**
-- Step counter at top: "Step [n] of 3" in textMuted, 13px, 16px padding — right-aligned
-- Instruction text: large, prominent — from `fixture.fixSteps[n].instruction` — textPrimary, 22px, font-weight 600, 16px padding, 24px top margin
-- Subtext: from `fixture.fixSteps[n].subtext` — textSecondary, 15px, 8px top margin
+**Standard layout:**
+- "Step [n] of 3" textMuted, 13px, 16px padding, right-aligned
+- Instruction from fixSteps[n].instruction — textPrimary, 22px, font-weight 600, 16px padding, 24px top
+- Subtext from fixSteps[n].subtext — textSecondary, 15px, 8px top
+- CTA: "Done, what's next?" — full width, ispPrimary, 56px
+- Secondary: "Skip this step →" textMuted, 14px, centered
+- Both advance to next step. After step 3 → screen 5.9
 
-**Step 2 is special (isWait: true):**
-- Show a countdown timer instead of the normal CTA
-- Large centered countdown: displays "0:30" counting down to "0:00" — 56px font, ispPrimary color, font-weight 700
-- Below timer: "Your router needs this time to fully reset." in textSecondary, 15px, centered
-- When timer hits 0, the "Done, what's next?" button appears with a fade-in
-- Timer starts automatically when this step screen mounts
+**Step 2 only (isWait: true):**
+- No CTA on mount
+- Countdown: "0:30" → "0:00", 56px, ispPrimary, font-weight 700, centered
+- Below: "Your router needs this time to fully reset." textSecondary, 15px, centered
+- Timer starts on mount (useEffect, setInterval, 1s tick)
+- At 0:00: "Done, what's next?" fades in (Framer Motion opacity 0→1, 300ms)
 
-**For all other steps:**
-- Primary CTA: "Done, what's next?" — full width, ispPrimary, 56px tall
-- Secondary: "Skip this step →" in textMuted, 14px, centered — advances same as primary
-
-**After step 3 ("plug back in"):** → screen 5.9
-
-Back button present on all steps, EscapeHatch present.
+Back button on all steps. EscapeHatch present.
 
 ---
 
 ## Screen 5.9 — Reconnection Wait
 
 - Centered vertically
-- Animated pulsing ring graphic (similar to outage check loading, but ispPrimary color, slightly larger — 96px)
-- "Give it a minute — your router is restarting…" in textPrimary, 18px, centered, 20px top margin
-- Subtext: "This usually takes 60–90 seconds." in textSecondary, 15px, centered
-- Progress dots or animated ellipsis below subtext
-- "It's back on →" button: appears after 5 seconds (setTimeout), full width, success color (#22C55E) background, white text, 56px tall — routes to screen 5.10
-- Below button (also after 5s): "Still not reconnecting?" link in textMuted, 14px, centered — routes to screen 5.13 (escalation)
-- No back button, EscapeHatch present
+- Pulsing ring: ispPrimary, 96px, ring expands and fades, 1.5s loop CSS animation
+- "Give it a minute — your router is restarting…" textPrimary, 18px, centered, 20px top
+- Subtext: "This usually takes 60–90 seconds." textSecondary, 15px, centered
+- Animated ellipsis (three dots cycling)
+- After 5 seconds, two elements fade in:
+  - "It's back on →" button: full width, success bg, white text, 56px → screen 5.10
+  - "Still not reconnecting?" textMuted, 14px, centered, 12px below → screen 5.13
+- No back button. EscapeHatch present.
 
 ---
 
 ## Screen 5.10 — Resolution
 
-- Full-screen celebration state
-- Large animated checkmark at center-top: draw animation using SVG stroke-dashoffset, success green color, 80px
-- "You're back online." in textPrimary, 28px, font-weight 700, centered, 16px top margin
-- Subtext: "Your UniFi Dream Machine is connected. Here's what fixed it:" in textSecondary, 15px, centered, 8px top margin
-- Summary card below: bgSuccessLight background, 12px radius, 16px padding, 16px margin
-  - "Restarted your router" with a checkmark — this is what resolved the issue
-- Star rating: "How'd we do?" in textSecondary, 14px, centered, 24px top margin
-  - 5 star icons side by side, 32px each, tapping highlights them in ispPrimary (yellow is fine too)
-- "Done" button at bottom: full width, ispPrimary, 56px tall — routes back to screen 2.1 (home dashboard)
-- No back button, no EscapeHatch (session is complete)
+- Animated SVG checkmark: stroke-dashoffset draw on mount, 80px, success color
+- "You're back online." textPrimary, 28px, font-weight 700, centered, 16px top
+- Subtext: "Your UniFi Dream Machine is connected. Here's what fixed it:" textSecondary, 15px, centered
+- Summary card: successLight bg, 12px radius, 16px padding, 16px margin
+  - Checkmark + "Restarted your router" textPrimary, 15px
+- "How'd we do?" textSecondary, 14px, centered, 24px top
+  - 5 star icons, 32px each, tap selects, highlights in ispPrimary
+- "Done" button: full width, ispPrimary, 56px → screen 2.1
+- No back button, no EscapeHatch
 ```
 
 ---
@@ -649,7 +827,7 @@ Back button present on all steps, EscapeHatch present.
 
 ### For you
 
-The escalation path needs to feel inevitable but not defeated — "you've done everything, here's the next step" not "you failed." The appointment booking screen is the most technically interesting piece: a simple date/slot picker using fixture data, no real calendar API.
+Tone on 5.13: "you've done everything, here's the next step" — not "you failed." The appointment booking screen is where the ISP integration story lands even in a prototype. The pre-populated diagnostic summary is the point.
 
 ---
 
@@ -664,58 +842,63 @@ Continuing Scout prototype. Phases 1–4 complete.
 
 ## Screen 5.13 — Escalation Intro
 
-- Centered vertically (slight top bias — 40% from top)
-- Icon: wrench or hard hat SVG, 56px, ispPrimary color
-- Header: "Let's get a technician out to you." in textPrimary, 24px, font-weight 700, centered, 16px top margin
-- Body: "You've done everything you can from home. This one needs a professional look — and they'll already have everything we diagnosed today." in textSecondary, 15px, centered, 12px top margin, 24px horizontal padding
-- Primary CTA: "Book an Appointment" — full width, ispPrimary, 56px tall, 24px top margin, 16px horizontal margin
-- Secondary: "Call Uplink Support instead" in textSecondary, 14px, centered, 12px top — displays phone number from fixture on tap (no actual call in prototype)
-- Back button present, EscapeHatch present
+- Centered (40% from top)
+- Wrench SVG icon, 56px, ispPrimary
+- Header: "Let's get a technician out to you." textPrimary, 24px, font-weight 700, centered, 16px top
+- Body: "You've done everything you can from home. This one needs a professional look — and they'll already have everything we diagnosed today." textSecondary, 15px, centered, 12px top, 24px horizontal padding
+- CTA: "Book an Appointment" — full width, ispPrimary, 56px, 24px top, 16px margin
+- Secondary: "Call IQ Fiber Support instead" textSecondary, 14px, centered, 12px below CTA
+  - Tapping reveals phone number inline (no actual call)
+- Back button, EscapeHatch present
 
 ---
 
 ## Screen 5.14 — Appointment Booking
 
-- Header: "Choose a time" in textPrimary, 22px, 24px top, 16px padding
-- Subtext: "A technician will arrive within the selected window." in textSecondary, 15px
+- Header: "Choose a time" textPrimary, 22px, 24px top, 16px padding
+- Subtext: "A technician will arrive within the selected window." textSecondary, 15px
 
-- Appointment slots from `fixture.appointmentSlots` — rendered as selectable cards:
-  - Each card: full width, 16px margin, 72px tall, 12px radius, border
-  - Layout: date on left (textPrimary, 15px, font-weight 500) + time on right (textSecondary, 14px)
-  - Selected state: ispPrimary border (2px), ispPrimaryLight background, checkmark icon on right
-  - Slot a1 is pre-selected by default
+Appointment slots from fixture.appointmentSlots:
+- Cards: full width, 16px margin, 72px tall, 12px radius, border
+- Date left (textPrimary, 15px, font-weight 500) / time right (textSecondary, 14px)
+- Selected: 2px ispPrimary border, ispPrimaryLight bg, checkmark right
+- Slot a1 pre-selected. Tap to select (single select).
 
-- Urgency toggle below slots: 
-  - Small card with toggle switch on right
-  - Label: "This is affecting my work or essential services" in textPrimary, 14px
-  - Subtext: "We'll try to prioritize your appointment." in textMuted, 13px
-  - Toggle defaults to off
+Urgency toggle card below slots:
+- Full width, 16px margin, border, 12px radius, 16px padding
+- "This is affecting my work or essential services" textPrimary, 14px
+- "We'll try to prioritize your appointment." textMuted, 13px
+- Toggle switch right, defaults off
 
-- Diagnostic info card at bottom of slot list:
-  - Collapsed by default — shows "Your technician will have your diagnostic info ›" in textSecondary, 14px
-  - Tap to expand: shows plain text summary — "Issue: No internet / Steps taken: Router restart / LED state: WAN solid red / Result: Unresolved"
-  - Toggle: "Share this with my technician" — on by default
+Diagnostic info disclosure below urgency card:
+- "Your technician will have your diagnostic info ›" textSecondary, 14px, collapsed
+- Tap to expand (Framer Motion height):
+  - "Issue: No internet"
+  - "Steps taken: Router restart (3 steps)"
+  - "LED state: WAN indicator solid red"
+  - "Result: Unresolved after restart"
+  - textSecondary, 14px, 8px gap
+- "Share this with my technician" toggle, defaults on
 
-- Primary CTA: "Confirm Appointment" — full width, ispPrimary, 56px tall, fixed at bottom with 16px margin
-- Back button present, EscapeHatch present
+CTA: "Confirm Appointment" — full width, ispPrimary, 56px, fixed bottom, 16px margin
+
+Back button, EscapeHatch present.
 
 ---
 
 ## Screen 5.16 — Appointment Confirmation
 
-- Full screen, bgSecondary background
-- White card (16px margin, 16px radius, 20px padding) centered with top bias:
+- bgSecondary full-screen
+- White card (16px margin, 16px radius, 20px padding), centered with top bias:
   - Green checkmark icon, 40px, centered
-  - "Appointment confirmed" in textPrimary, 20px, font-weight 700, centered, 8px top margin
-  - Confirmed date/time from fixture: "Thursday, May 7 · 9:00 AM – 11:00 AM" — ispPrimary color, 16px, font-weight 500, centered, 12px top margin
-  - Divider line
-  - "Your technician will have your full diagnostic report when they arrive." in textSecondary, 14px, centered, 12px top margin
-  - "Uplink Internet — [phone number]" in textMuted, 13px, centered, 8px top margin
-
-- "Add to Calendar" button below card: outline style (ispPrimary border and text, white background), full width minus 32px margin, 48px tall — does nothing in prototype but tap target should be real
-- "Done" link below: textMuted, 14px, centered — routes back to screen 2.1
-
-- No back button, no EscapeHatch (booking is complete)
+  - "Appointment confirmed" textPrimary, 20px, font-weight 700, centered, 8px below
+  - "Thursday, May 7 · 9:00 AM – 11:00 AM" ispPrimary, 16px, font-weight 500, centered, 12px below
+  - Horizontal divider
+  - "Your technician will have your full diagnostic report when they arrive." textSecondary, 14px, centered, 12px below
+  - "IQ Fiber Support · 1-833-474-3237" textMuted, 13px, centered, 8px below
+- "Add to Calendar" button below card: ispPrimary border and text, white bg, full width minus 32px, 48px — wired tap target, does nothing
+- "Done" textMuted, 14px, centered, 12px below → screen 2.1
+- No back button, no EscapeHatch
 ```
 
 ---
@@ -724,25 +907,27 @@ Continuing Scout prototype. Phases 1–4 complete.
 
 ### For you
 
-This phase is done in Cursor, not Claude Code. Open the project in Cursor and work through this list manually. The goal is feel, not features.
+Done in Cursor, not Claude Code. Goal is feel, not features.
 
-1. **Test the full flow** start to finish: Splash → ISP Selection → Login → OTP → Home → No Internet → Outage Check → No Outage → Behavioral Proxy → Photo Prompt → Photo Analysis → Diagnosis → Fix Step 1 → Fix Step 2 (countdown) → Fix Step 3 → Reconnection Wait → Resolution. Then test the escalation branch: Diagnosis → Skip to Booking → Escalation Intro → Appointment Booking → Confirmation.
+1. **Run the full forward flow:** Splash → ISP Selection (tap a wrong ISP first, confirm the message appears, then tap IQ Fiber) → Login → OTP (try a wrong code first) → Home → No Internet → Outage Check → No Outage → Behavioral Proxy → Photo Prompt → Photo Analysis → Diagnosis → Fix Step 1 → Fix Step 2 (watch the full countdown) → Fix Step 3 → Reconnection Wait → Resolution → Home.
 
-2. **Check transitions**: Every screen change should slide left on forward navigation, slide right on back. If any screen pops instead of slides, fix it.
+2. **Run the escalation branch:** Diagnosis → "Skip to booking" → Escalation Intro → Appointment Booking (toggle the diagnostic disclosure, try the urgency toggle) → Confirmation → Home.
 
-3. **Test on your phone**: Open the Vercel URL on your iPhone in mobile Safari. Look for:
-   - Tap targets smaller than 44px — make them bigger
-   - Text that feels too small on the actual screen — bump it up
-   - Any screen that requires scrolling when it shouldn't
+3. **Check every transition:** Forward = slide left, back = slide right. Any screen that pops instead of slides — fix it.
 
-4. **The AI diagnosis screen specifically**: Play through it three times. The scan animation + sequential text messages + result reveal is the moment this prototype either lands or doesn't. If the timing feels off, adjust the delays.
+4. **Test on your actual phone:** Open the Vercel URL in mobile Safari on your iPhone. Check:
+   - Tap targets smaller than 44×44px
+   - Text that feels too small on the real screen
+   - Any screen requiring scroll when it shouldn't
 
-5. **The 30-second countdown on Fix Step 2**: Watch the whole thing once. It should feel like a feature, not a bug. If it feels too long for a demo, change `waitSeconds` in fixture.ts to 15.
+5. **Photo analysis screen:** Watch the sequence three times — scan animation, sequential checkmarks, result reveal, Continue fade-in. Adjust delays if timing feels off.
 
-6. **Fill in the prototype section of the memo**: In `resolve_customer_memo_v4.md`, replace the placeholder with something like:
-   > The prototype covers the complete no-internet diagnostic loop: ISP selection, account recognition, outage check, photo-based LED diagnosis, device-specific guided fix steps, reconnection detection, and technician appointment booking. The slow internet and "something else" flows are scoped in the screen inventory but excluded from the prototype — the no-internet flow is the binary, demonstrable case that proves the diagnostic thesis. Camera integration and SSID detection are simulated; the prototype makes no real API calls.
+6. **Fix Step 2 countdown:** Watch it once. If 30 seconds feels too long for a demo, change `waitSeconds` to 15 in `lib/fixture.ts`.
 
-7. **Push final commit** with message `"phase-6: polish"`. Verify the Vercel deployment URL works and loads clean.
+7. **Fill in the prototype section of the memo** — replace the `[PROTOTYPE PLAN]` placeholder in `resolve_customer_memo_v4.md` with:
+   > The prototype covers the complete no-internet diagnostic loop: ISP selection with 10 real providers (6 confirmed gaiia customers), account recognition, outage check, photo-based LED diagnosis with simulated AI analysis, device-specific guided fix steps including a timed reboot sequence, reconnection detection, and technician appointment booking with pre-populated diagnostic context. The slow internet and "something else" flows are fully specified in the screen inventory but excluded from the prototype — the no-internet flow is the binary, demonstrable case that proves the diagnostic thesis. Camera integration and SSID detection are simulated; the prototype makes no real API calls.
+
+8. **Push final commit:** `"phase-6: polish"`. Confirm the Vercel URL loads clean before submitting.
 
 ---
 
@@ -751,26 +936,29 @@ This phase is done in Cursor, not Claude Code. Open the project in Cursor and wo
 ```
 Splash (1.1)
   → ISP Selection (1.2)
-    → Login (1.3)
-      → OTP (1.4)
-        → Home Dashboard (2.1)
-          → Issue Selection (3.1)
-            → [No Internet selected]
-              → Outage Check Loading (4.1)
-                → No Outage Detected (4.3) [auto-advance]
-                  → Behavioral Proxy (5.1)
-                    → Photo Prompt (5.3)
-                      → Photo Analysis (5.4) [simulated]
-                        → AI Diagnosis (5.6)
-                          → [Let's fix it]
-                            → Fix Step 1 (5.7)
-                              → Fix Step 2 — countdown (5.7)
-                                → Fix Step 3 (5.7)
-                                  → Reconnection Wait (5.9)
-                                    → Resolution (5.10) → Home
-                                    → Still not working → Escalation Intro (5.13)
-                          → [Skip to booking]
-                            → Escalation Intro (5.13)
-                              → Appointment Booking (5.14)
-                                → Appointment Confirmation (5.16) → Home
+      [wrong ISP] → cheeky inline message, stays on screen
+      [IQ Fiber] → Login (1.3)
+        → OTP (1.4)
+          → Home Dashboard (2.1)
+            → Issue Selection (3.1)
+              → [No Internet]
+                → Outage Check Loading (4.1) [2s auto-advance]
+                  → No Outage Detected (4.3) [1.5s auto-advance]
+                    → Behavioral Proxy (5.1)
+                      → Photo Prompt (5.3)
+                        → Photo Analysis (5.4) [2.5s simulated]
+                          → AI Diagnosis (5.6)
+                            → [Let's fix it]
+                              → Fix Step 1 (5.7)
+                                → Fix Step 2 — 30s countdown (5.7)
+                                  → Fix Step 3 (5.7)
+                                    → Reconnection Wait (5.9) [5s delay]
+                                      → Resolution (5.10) → Home (2.1)
+                                      → [Still not reconnecting]
+                                        → Escalation Intro (5.13)
+                            → [Skip to booking]
+                              → Escalation Intro (5.13)
+                                → Appointment Booking (5.14)
+                                  → Appointment Confirmation (5.16)
+                                    → Home Dashboard (2.1)
 ```
