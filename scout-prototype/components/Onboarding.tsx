@@ -11,7 +11,6 @@ import { Home } from './screens/Home'
 import { startOutageCheck } from '@/lib/outageCheck'
 import { IssueSelection } from './screens/IssueSelection'
 import { OutageCheck } from './screens/OutageCheck'
-import { NoOutage } from './screens/NoOutage'
 import { BehavioralProxy } from './screens/BehavioralProxy'
 import { DevicePhotoPrompt } from './screens/DevicePhotoPrompt'
 import { PhotoAnalysis } from './screens/PhotoAnalysis'
@@ -32,7 +31,6 @@ export type Screen =
   | 'home'
   | 'issue'
   | 'outage-check'
-  | 'no-outage'
   | 'behavioral'
   | 'photo-prompt'
   | 'photo-analysis'
@@ -129,8 +127,7 @@ export function Onboarding() {
               onBack={() => go('home', 'back')}
             />
           )}
-          {screen === 'outage-check' && <OutageCheck onAdvance={() => go('no-outage')} />}
-          {screen === 'no-outage' && <NoOutage onAdvance={() => go('behavioral')} />}
+          {screen === 'outage-check' && <OutageCheck onAdvance={() => go('behavioral')} />}
           {screen === 'behavioral' && (
             <BehavioralProxy
               onContinue={() => go('photo-prompt')}

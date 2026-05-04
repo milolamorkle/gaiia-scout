@@ -53,4 +53,28 @@ export const fixture = {
     date: 'Thursday, May 7',
     time: '9:00 AM – 11:00 AM',
   },
+  account: {
+    id: 'IQF-00041823',
+    since: 'March 12, 2023',
+    nextBillingDate: 'June 1, 2026',
+    nextBillingAmount: '$79.00',
+    autopay: true,
+    paymentMethod: 'Visa ending in 4821',
+  },
+  
+  invoices: [
+    { id: 'INV-2026-04', date: 'May 1, 2026',   amount: '$79.00', status: 'paid' },
+    { id: 'INV-2026-03', date: 'April 1, 2026',  amount: '$79.00', status: 'paid' },
+    { id: 'INV-2026-02', date: 'March 1, 2026',  amount: '$79.00', status: 'paid' },
+    { id: 'INV-2026-01', date: 'February 1, 2026', amount: '$79.00', status: 'paid' },
+    { id: 'INV-2025-12', date: 'January 1, 2026', amount: '$79.00', status: 'paid' },
+    { id: 'INV-2025-11', date: 'December 1, 2025', amount: '$79.00', status: 'paid' },
+  ],
+  
+  techNote: {
+    exists: true,
+    note: 'Router is mounted on the wall in the utility closet near the front door.',
+    techName: 'Marcus T.',
+    installDate: 'March 12, 2023',
+  },
 }
