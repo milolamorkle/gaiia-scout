@@ -37,7 +37,7 @@ export function IspSelection({
       style={{
         position: "absolute",
         inset: 0,
-        backgroundColor: tokens.gaiiaPrimary,
+        backgroundColor: tokens.bg,
         display: "flex",
         flexDirection: "column",
       }}
@@ -67,7 +67,7 @@ export function IspSelection({
             padding: `0 ${tokens.space16}`,
             fontSize: 15,
             color: tokens.gaiiaForeground,
-            backgroundColor: tokens.gaiiaPrimary,
+            backgroundColor: tokens.bg,
             outline: "none",
             boxSizing: "border-box",
           }}
@@ -121,7 +121,7 @@ function IspRow({
           display: "flex",
           alignItems: "center",
           gap: tokens.space12,
-          backgroundColor: flashing ? tokens.gaiiaPressed : tokens.gaiiaPrimary,
+          backgroundColor: flashing ? tokens.bgTertiary : tokens.bg,
           border: "none",
           borderBottom: `1px solid ${tokens.gaiiaBorder}`,
           textAlign: "left",
@@ -148,7 +148,7 @@ function IspRow({
               style={{
                 margin: `${tokens.space12} ${tokens.space16}`,
                 padding: "12px 16px",
-                backgroundColor: tokens.gaiiaPressed,
+                backgroundColor: tokens.bg,
                 border: `1px solid ${tokens.gaiiaBorder}`,
                 borderRadius: 12,
                 color: tokens.gaiiaForeground,
