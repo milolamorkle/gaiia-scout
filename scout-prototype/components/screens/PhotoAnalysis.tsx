@@ -112,6 +112,7 @@ export function PhotoAnalysis({ onContinue }: { onContinue: () => void }) {
         >
           {fixture.diagnosis.interpretation}
         </p>
+        <RouterDiagram />
       </div>
 
       <div style={{ flex: 1 }} />
@@ -141,6 +142,90 @@ export function PhotoAnalysis({ onContinue }: { onContinue: () => void }) {
           Continue &rarr;
         </button>
       </motion.div>
+    </div>
+  )
+}
+
+function RouterDiagram() {
+  return (
+    <div
+      style={{
+        marginTop: 20,
+        marginBottom: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <svg
+        width="280"
+        height="160"
+        viewBox="0 0 280 160"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-label="Router front face with WAN indicator highlighted"
+      >
+        <defs>
+          <marker
+            id="wan-arrowhead"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="4"
+            orient="auto"
+          >
+            <path d="M0,0 L8,4 L0,8 Z" fill={tokens.error} />
+          </marker>
+        </defs>
+
+        <rect x="30" y="50" width="170" height="70" rx="8" fill="#1e293b" />
+
+        <circle cx="79" cy="68" r="6" fill="#166534" />
+        <circle cx="103" cy="68" r="6" fill={tokens.error} />
+        <circle cx="127" cy="68" r="6" fill="#166534" />
+        <circle cx="151" cy="68" r="6" fill="#166534" />
+
+        <text x="79" y="90" fontSize="9" textAnchor="middle" fill="#FFFFFF">
+          Power
+        </text>
+        <text x="103" y="90" fontSize="9" textAnchor="middle" fill="#FFFFFF">
+          WAN
+        </text>
+        <text x="127" y="90" fontSize="9" textAnchor="middle" fill="#FFFFFF">
+          LAN
+        </text>
+        <text x="151" y="90" fontSize="9" textAnchor="middle" fill="#FFFFFF">
+          Wi-Fi
+        </text>
+
+        <path
+          d="M 235 38 Q 180 12 110 60"
+          stroke={tokens.error}
+          strokeWidth="2"
+          fill="none"
+          markerEnd="url(#wan-arrowhead)"
+        />
+
+        <text
+          x="270"
+          y="30"
+          fontSize="11"
+          textAnchor="end"
+          fontWeight="600"
+          fill={tokens.error}
+        >
+          WAN indicator
+        </text>
+      </svg>
+      <p
+        style={{
+          margin: `${tokens.space8} 0 0 0`,
+          fontSize: tokens.fontSM,
+          color: tokens.textMuted,
+          textAlign: 'center',
+        }}
+      >
+        This is the light we&rsquo;re diagnosing.
+      </p>
     </div>
   )
 }
