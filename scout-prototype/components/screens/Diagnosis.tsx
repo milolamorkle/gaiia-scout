@@ -146,9 +146,10 @@ export function Diagnosis({
             background: 'transparent',
             border: 'none',
             padding: 0,
-            color: tokens.textMuted,
+            color: tokens.textSecondary,
             fontSize: 14,
             cursor: 'pointer',
+            textDecoration: 'underline',
           }}
         >
           Skip to booking a technician &rarr;
