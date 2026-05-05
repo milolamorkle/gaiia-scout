@@ -11,7 +11,7 @@ import { Home } from "./screens/Home";
 import { Account } from "./screens/Account";
 import { Billing } from "./screens/Billing";
 import { startOutageCheck } from "@/lib/outageCheck";
-import type { Tab } from "@/components/BottomNav";
+import { BottomNav, type Tab } from "@/components/BottomNav";
 import { IssueSelection } from "./screens/IssueSelection";
 import { OutageCheck } from "./screens/OutageCheck";
 import { BehavioralProxy } from "./screens/BehavioralProxy";
@@ -49,15 +49,15 @@ export type Screen =
   | "appointment-booking"
   | "appointment-confirmation";
 
-type Direction = "forward" | "back";
+type Direction = "forward" | "back" | "none";
 
 const variants = {
   enter: (direction: Direction) => ({
-    x: direction === "forward" ? "100%" : "-100%",
+    x: direction === "none" ? 0 : direction === "forward" ? "100%" : "-100%",
   }),
   center: { x: 0 },
   exit: (direction: Direction) => ({
-    x: direction === "forward" ? "-100%" : "100%",
+    x: direction === "none" ? 0 : direction === "forward" ? "-100%" : "100%",
   }),
 };
 
@@ -77,7 +77,9 @@ export function Onboarding() {
   };
 
   const navigateTab = (tab: Tab) => {
-    go(tab);
+    if (screen !== tab) {
+      go(tab, "none");
+    }
   };
 
   const logout = () => {
@@ -120,6 +122,10 @@ export function Onboarding() {
   };
 
   const motionKey = screen === "fix-step" ? `fix-step-${fixStepIndex}` : screen;
+  const activeTab: Tab | null =
+    screen === "home" || screen === "account" || screen === "billing"
+      ? screen
+      : null;
 
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
@@ -134,7 +140,7 @@ export function Onboarding() {
           transition={{
             type: "tween",
             ease: [0.32, 0.72, 0, 1],
-            duration: 0.32,
+            duration: direction === "none" ? 0 : 0.32,
           }}
           style={{ position: "absolute", inset: 0, backgroundColor: "#FFFFFF" }}
         >
@@ -160,13 +166,9 @@ export function Onboarding() {
           {screen === "account-loading" && (
             <AccountLoading onAdvance={() => go("home")} />
           )}
-          {screen === "home" && (
-            <Home onTroubleshoot={() => go("issue")} onNavigate={navigateTab} />
-          )}
-          {screen === "account" && (
-            <Account onNavigate={navigateTab} onLogout={logout} />
-          )}
-          {screen === "billing" && <Billing onNavigate={navigateTab} />}
+          {screen === "home" && <Home onTroubleshoot={() => go("issue")} />}
+          {screen === "account" && <Account onLogout={logout} />}
+          {screen === "billing" && <Billing />}
           {screen === "issue" && (
             <IssueSelection
               onSelectNoInternet={() => go("outage-check")}
@@ -256,6 +258,7 @@ export function Onboarding() {
           )}
         </motion.div>
       </AnimatePresence>
+      {activeTab && <BottomNav active={activeTab} onSelect={navigateTab} />}
     </div>
   );
 }

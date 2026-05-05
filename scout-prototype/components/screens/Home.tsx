@@ -5,17 +5,14 @@ import { motion } from "framer-motion";
 import { tokens } from "@/lib/tokens";
 import { fixture } from "@/lib/fixture";
 import { IQ_FIBER } from "@/lib/isps";
-import { BottomNav, type Tab } from "@/components/BottomNav";
 import { getOutageCheckRemainingMs } from "@/lib/outageCheck";
 
 const BOTTOM_NAV_HEIGHT = 56;
 
 export function Home({
   onTroubleshoot,
-  onNavigate,
 }: {
   onTroubleshoot?: () => void;
-  onNavigate?: (tab: Tab) => void;
 } = {}) {
   return (
     <div
@@ -175,8 +172,6 @@ export function Home({
           </button>
         </div>
       </div>
-
-      <BottomNav active="home" onSelect={onNavigate} />
     </div>
   );
 }

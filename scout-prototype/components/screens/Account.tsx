@@ -3,15 +3,12 @@
 import { tokens } from "@/lib/tokens";
 import { fixture } from "@/lib/fixture";
 import { IQ_FIBER } from "@/lib/isps";
-import { BottomNav, type Tab } from "@/components/BottomNav";
 
 const BOTTOM_NAV_HEIGHT = 56;
 
 export function Account({
-  onNavigate,
   onLogout,
 }: {
-  onNavigate?: (tab: Tab) => void;
   onLogout?: () => void;
 } = {}) {
   return (
@@ -177,8 +174,6 @@ export function Account({
           />
         </section>
       </div>
-
-      <BottomNav active="account" onSelect={onNavigate} />
     </div>
   );
 }

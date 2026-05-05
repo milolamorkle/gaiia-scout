@@ -3,13 +3,10 @@
 import { tokens } from "@/lib/tokens";
 import { fixture } from "@/lib/fixture";
 import { IQ_FIBER } from "@/lib/isps";
-import { BottomNav, type Tab } from "@/components/BottomNav";
 
 const BOTTOM_NAV_HEIGHT = 56;
 
-export function Billing({
-  onNavigate,
-}: { onNavigate?: (tab: Tab) => void } = {}) {
+export function Billing() {
   return (
     <div
       style={{
@@ -215,8 +212,6 @@ export function Billing({
           </div>
         </div>
       </div>
-
-      <BottomNav active="billing" onSelect={onNavigate} />
     </div>
   );
 }
